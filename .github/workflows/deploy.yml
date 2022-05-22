@@ -19,9 +19,9 @@ jobs:
       - name: Build
         run: |
           hugo --minify
-          cp ./docs/403/index.html 403.html
-          cp ./docs/404/index.html 404.html
-          cp ./docs/500/index.html 500.html
+          cp ./docs/403/index.html ./docs/403.html
+          cp ./docs/404/index.html ./docs/404.html
+          cp ./docs/500/index.html ./docs/500.html
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
