@@ -1,0 +1,175 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>簡易Deployerを実装しました | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="簡易的なDeployerをRustで実装しました">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2020/12/02/deployer/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2020/12/02/deployer/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="簡易Deployerを実装しました">
+<meta property="og:description" content="簡易的なDeployerをRustで実装しました">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/img/default_thumbnail.png">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>簡易Deployerを実装しました</h1>
+<p class=meta><time datetime=2020-12-02T20:27:21+09:00>December 02, 2020</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/%e3%83%96%e3%83%ad%e3%82%b0%e5%88%b6%e4%bd%9c/ class=categories_item>ブログ制作</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/%e3%83%96%e3%83%ad%e3%82%b0%e5%88%b6%e4%bd%9c/>ブログ制作</a></li><li class=tags_item><a href=https://blog.toyama1710.net/tags/%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af/>ネットワーク</a></li>
+</ul>
+</div>
+</div>
+</header>
+<aside>
+<div class=toc>
+<details>
+<summary>Table of Contents</summary>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#はじめに>はじめに</a></li>
+<li><a href=#ユーザ認証の仕組み>ユーザ認証の仕組み</a>
+<ul>
+<li><a href=#鍵の制約>鍵の制約</a></li>
+</ul>
+</li>
+<li><a href=#認証後の通信>認証後の通信</a></li>
+<li><a href=#更新ファイルの確認>更新ファイルの確認</a></li>
+<li><a href=#コマンドクライアント>コマンド(クライアント)</a></li>
+<li><a href=#設定ファイルクライアント>設定ファイル(クライアント)</a></li>
+<li><a href=#コマンドホスト>コマンド(ホスト)</a></li>
+<li><a href=#設定ファイルホスト>設定ファイル(ホスト)</a></li>
+<li><a href=#todo>TODO</a></li>
+</ul>
+</nav>
+</details>
+</div>
+</aside><hr>
+<h2 id=はじめに>はじめに</h2>
+<p>このブログのデプロイをscpで手作業で行っていたのを自動化しました<br>
+github のレポジトリは<a href=https://github.com/toyama1710/ssg-deployer/>こちら</a></p>
+<p>この記事は設計~開発の段階でメモ用紙代りに使っていた物です</p>
+<h2 id=ユーザ認証の仕組み>ユーザ認証の仕組み</h2>
+<p>RSA暗号を使います</p>
+<p>事前にクライアントとホストでお互いに公開鍵を交換しておきます<br>
+通信相手はこの公開鍵に対応する秘密鍵を持っているか？というのが基本的なアイデアです</p>
+<ol>
+<li>適当な長さの乱数列を暗号化して送信</li>
+<li>相手が乱数列を復号して返信してくるので、正しく復号できているか確認する</li>
+<li>正しく復号できていれば通信相手を信頼して良い　さもなければTCPコネクションを切断する</li>
+</ol>
+<h3 id=鍵の制約>鍵の制約</h3>
+<p>PEM 形式の 4096 bit の鍵ファイルのみ受け付けます</p>
+<p>いつも 2048 bit 使ってたりする人はごめんね</p>
+<h2 id=認証後の通信>認証後の通信</h2>
+<p>RSAの暗号化/復号処理は重いので、ユーザ認証後は AES256CBC で暗号化して通信します<br>
+鍵はセッションごとに乱数で生成</p>
+<h2 id=更新ファイルの確認>更新ファイルの確認</h2>
+<p>これは単純で、ホスト側とクライアント側でファイルのハッシュ値(SHA256)が同一か見てるだけ</p>
+<p>ハッシュ値が違っていたり、ホスト側に存在しないファイルがあればそのファイルを送信します<br>
+ホスト側にだけ存在しているファイルは消去します</p>
+<h2 id=コマンドクライアント>コマンド(クライアント)</h2>
+<p><code>deploy section</code></p>
+<h2 id=設定ファイルクライアント>設定ファイル(クライアント)</h2>
+<p>dirs::config_dir()/ssg-deployer/config.toml に置く<br>
+Linux であれば ~/.config/ssg-deployer/config.toml になるはず</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-toml data-lang=toml><span class=p>[[</span><span class=nx>section</span><span class=p>]]</span>
+<span class=nx>name</span> <span class=p>=</span> <span class=s2>&#34;section_name&#34;</span>
+<span class=nx>user</span> <span class=p>=</span> <span class=s2>&#34;user_name&#34;</span>
+<span class=nx>host</span> <span class=p>=</span> <span class=s2>&#34;hostname&#34;</span>
+<span class=nx>publish_dir</span> <span class=p>=</span> <span class=s2>&#34;/path/to/public/&#34;</span>
+<span class=nx>port</span> <span class=p>=</span> <span class=mi>1710</span>
+<span class=nx>own_pri</span> <span class=p>=</span> <span class=s2>&#34;/path/to/.ssh/id.pem&#34;</span>
+<span class=nx>host_pub</span> <span class=p>=</span> <span class=s2>&#34;/path/to/.ssh/host.pem.pub&#34;</span>
+</code></pre></div><p>パスは絶対パスのみ受け付ける<br>
+必ず &lsquo;/&rsquo; から始まっていること</p>
+<h2 id=コマンドホスト>コマンド(ホスト)</h2>
+<p><code>deploy-host</code>
+<code>-p num</code> でリッスンするポートを指定できる</p>
+<p>優先順はコマンド > 設定ファイル</p>
+<h2 id=設定ファイルホスト>設定ファイル(ホスト)</h2>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-toml data-lang=toml><span class=nx>port</span> <span class=p>=</span> <span class=mi>1710</span>
+
+<span class=p>[[</span><span class=nx>authorized_client</span><span class=p>]]</span>
+<span class=nx>user</span> <span class=p>=</span> <span class=s2>&#34;user_name&#34;</span>
+<span class=nx>client_pub</span> <span class=p>=</span> <span class=s2>&#34;/var/www/id_client.pem.pub&#34;</span>
+<span class=nx>own_pri</span> <span class=p>=</span> <span class=s2>&#34;/var/www/id.pem&#34;</span>
+
+<span class=p>[[</span><span class=nx>autorized_client</span><span class=p>]]</span>
+<span class=nx>use</span> <span class=p>=</span> <span class=s2>&#34;toyama&#34;</span>
+<span class=nx>client_pub</span> <span class=p>=</span> <span class=s2>&#34;/var/www/id_toyama.pem.pub&#34;</span>
+<span class=nx>own_pri</span> <span class=p>=</span> <span class=s2>&#34;/var/www/id.pem&#34;</span>
+
+<span class=p>[[</span><span class=nx>section</span><span class=p>]]</span>
+<span class=nx>name</span> <span class=p>=</span> <span class=s2>&#34;section_name&#34;</span>
+<span class=nx>publish_dir</span> <span class=p>=</span> <span class=s2>&#34;var/www/public/&#34;</span>
+</code></pre></div><p>パスは絶対パスのみ受け付ける<br>
+必ず &lsquo;/&rsquo; から始まっていること</p>
+<h2 id=todo>TODO</h2>
+<ul>
+<li>ドキュメントをgithubに移す</li>
+<li>‘~' から始まるパスにも対応する</li>
+</ul>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2020/12/10/alds/ class=larrow>
+AOJ ALDS1 を Rust で全埋めしたので感想
+</a>
+<a href=https://blog.toyama1710.net/posts/2020/11/23/rust_module/ class=rarrow>
+RustのモジュールシステムのTips
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>

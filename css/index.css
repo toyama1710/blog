@@ -1,0 +1,259 @@
+@media (min-width: 50em) {
+  @font-face {
+    font-family: 'PT Sans';
+    src: local("PT Sans"), local("PTSans-Regular"), url("../fonts/PTSans-Regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'PT Sans';
+    src: local("PT Sans Bold"), local("PTSans-Bold"), url("../fonts/PTSans-Bold.woff") format("woff");
+    font-weight: bold;
+    font-style: normal;
+  }
+}
+
+html {
+  font-size: 1rem;
+  color: #243;
+}
+
+body {
+  font-size: 1.1em;
+  font-family: "PT Sans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", "Roboto", sans-serif;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* tablet */
+@media screen and (max-width: 960px) {
+  body {
+    font-size: 1em
+    font-family: "PT Sans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", "Roboto", sans-serif;
+    font-weight: 500;
+    line-height: 1.6;
+    margin: 0;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+}
+
+/* phone */
+@media screen and (max-width: 560px) {
+  body {
+    font-size: 1em;
+    font-family: "PT Sans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", "Roboto", sans-serif;
+    font-weight: 500;
+    line-height: 1.6;
+    margin: 0;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: #111;
+}
+
+h1 {
+  color: #000;
+}
+
+h2 {
+  font-size: 1.3em;
+  border-bottom: 4px solid #ff0000;
+}
+h3 {
+  font-size: 1.2em;
+  border-bottom: 3px solid #fa5555;
+}
+
+b, strong, th {
+  font-weight: 600; }
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #99e;
+  border-color: #99e;
+}
+
+article a {
+  color: #f43;
+  font-weight: 600;
+}
+
+time {
+  color: #8e8e91;
+}
+
+hr {
+  border: 1px solid rgba(142, 142, 145, 0.3);
+  margin: 2em 0;
+}
+
+blockquote {
+  background: rgba(142, 142, 145, 0.06);
+  border-left: 3px solid rgba(142, 142, 145, 0.9);
+  padding: 1px 1.5em;
+  opacity: .75;
+}
+
+blockquote, figure {
+  margin: 1em 0;
+}
+
+img, li {
+  margin: .5em 0;
+}
+
+img {
+  border-radius: 2px;
+  max-width: 100%;
+  height: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td, tr {
+  padding: 0.25em 1em;
+  margin: 0;
+  border: solid 1px #ccc;
+}
+
+pre {
+  background: rgba(142, 142, 145, 0.12);
+  border-radius: 2px;
+  margin: 1.5em 0;
+  padding: .8em 1.2em;
+  overflow-x: auto;
+}
+
+:not(pre) > code {
+  font-size: .9em;
+  background: rgba(142, 142, 145, 0.15);
+  opacity: .7;
+  border-radius: 2px;
+  margin: 0 .1em;
+  padding: .2em .4em;
+}
+
+body > header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+article > header {
+  margin-bottom: 2em;
+}
+
+nav {
+  margin: .5em .8em;
+}
+
+nav a {
+  margin: .5em .8em;
+}
+
+body > header, body > article, body > footer {
+  padding: 1.3em;
+}
+
+footer {
+  background: #000000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #707070;
+  font-size: 0.8em;
+  padding: 0;
+  margin: auto 0 0 0;
+}
+
+footer ul {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  padding: 0;
+  margin: 0 0.1em;
+  list-style-type: none;
+}
+
+footer ul > li {
+  margin: 0;
+  padding: 0 1em;
+}
+
+footer ul > li + li {
+  border-left: solid 2px #505050;
+}
+
+footer ul > li > p {
+  margin: 0;
+  padding: 0;
+}
+
+footer a {
+  margin: 0;
+  padding: 0;
+  color: #7f7f7f;
+  text-decoration: underline;
+}
+
+address {
+  font-style: normal;
+}
+
+@media (min-width: 32em) {
+  body > header, body > article {
+    padding: 1.5em calc(25% - 4em);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    background: #141313;
+    color: #bbb;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    color: #fff;
+  }
+  article a {
+    color: #f75;
+  }
+  a:hover {
+    color: #aae;
+    border-color: #aae;
+  }
+  time {
+    color: #7e7e81;
+ }
+}

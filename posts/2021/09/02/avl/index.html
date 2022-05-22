@@ -1,0 +1,188 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>AVL木書いた | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="AVL木でC++のstd::multiset相当のものを実装した">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2021/09/02/avl/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2021/09/02/avl/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="AVL木書いた">
+<meta property="og:description" content="AVL木でC++のstd::multiset相当のものを実装した">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/img/default_thumbnail.png">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css integrity=sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq crossorigin=anonymous>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js integrity=sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js integrity=sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI crossorigin=anonymous onload=renderMathInElement(document.body)></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}]})})</script>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>AVL木書いた</h1>
+<p class=meta><time datetime=2021-09-02T02:49:09+09:00>September 02, 2021</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/%e7%ab%b6%e3%83%97%e3%83%ad/ class=categories_item>競プロ</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/%e3%83%a9%e3%82%a4%e3%83%96%e3%83%a9%e3%83%aa/>ライブラリ</a></li><li class=tags_item><a href=https://blog.toyama1710.net/tags/%e5%b9%b3%e8%a1%a1%e4%ba%8c%e5%88%86%e6%9c%a8/>平衡二分木</a></li>
+</ul>
+</div>
+</div>
+</header>
+<aside>
+<div class=toc>
+<details>
+<summary>Table of Contents</summary>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#外から叩くメソッド>外から叩くメソッド</a>
+<ul>
+<li><a href=#template引数>template引数</a></li>
+<li><a href=#insertconst-t-dat>insert(const T &dat)</a></li>
+<li><a href=#eraseconst-t-dat>erase(const T &dat)</a></li>
+<li><a href=#containsconst-t-dat>contains(const T &dat)</a></li>
+<li><a href=#lower_boundconst-t-x>lower_bound(const T &x)</a></li>
+<li><a href=#upper_boundconst-t-x>upper_bound(const T &x)</a></li>
+<li><a href=#find_kthint-k>find_Kth(int k)</a></li>
+<li><a href=#countconst-t-x>count(const T &x)</a></li>
+<li><a href=#count_lowerconst-t-x>count_lower(const T &x)</a></li>
+<li><a href=#count_upperconst-t-x>count_upper(const T &x)</a></li>
+<li><a href=#list>list()</a></li>
+<li><a href=#merge_withavlset-r>merge_with(AVLSet &r)</a></li>
+<li><a href=#splitint-k>split(int k)</a></li>
+</ul>
+</li>
+<li><a href=#内部での実装補助用の関数>内部での実装補助用の関数</a>
+<ul>
+<li><a href=#rotatenode-u>rotate(Node *u)</a></li>
+<li><a href=#balancenode-u>balance(Node *u)</a></li>
+<li><a href=#isolate_nodenode-u>isolate_node(Node *u)</a></li>
+<li><a href=#split_rightest_nodenode-v>split_rightest_node(Node *v)</a></li>
+<li><a href=#dump>dump()</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+</details>
+</div>
+</aside><hr>
+<p><a href=https://toyama1710.github.io/cpp_library/bbst/avl_set.hpp>AVLSet</a> のドキュメント</p>
+<h2 id=外から叩くメソッド>外から叩くメソッド</h2>
+<h3 id=template引数>template引数</h3>
+<p>template引数Tが満たすべき要件は以下</p>
+<ul>
+<li>operator &lt; を実装していること</li>
+<li>順序が正しく定義されていること</li>
+</ul>
+<h3 id=insertconst-t-dat>insert(const T &dat)</h3>
+<p>datを集合に挿入する<br>
+格納しているデータ数 $N$ に対して $\Theta(\log N)$</p>
+<p>既に同値なデータが木に含まれている場合にも新たにノードを作って挿入する</p>
+<h3 id=eraseconst-t-dat>erase(const T &dat)</h3>
+<p>dat を削除する $\Theta(\log N)$ <br>
+同じ要素が複数ある場合、そのうちの一つのみを削除する</p>
+<h3 id=containsconst-t-dat>contains(const T &dat)</h3>
+<p>datが集合に含まれている場合trueを返し、そうでないときfalseを返す</p>
+<h3 id=lower_boundconst-t-x>lower_bound(const T &x)</h3>
+<p>戻り値はoptional<t> 計算量は $\Theta(\log N)$<br>
+x以上の最小の要素を探して返す　そのような要素がないときはnulloptを返す</p>
+<h3 id=upper_boundconst-t-x>upper_bound(const T &x)</h3>
+<p>ほぼlower_bound()と同じ<br>
+xより大きい最小の要素を返す　</p>
+<h3 id=find_kthint-k>find_Kth(int k)</h3>
+<p>集合内の要素の小さい方から $k$ 番目の要素を返し、ない場合はnulloptを返す<br>
+0-indexedなのでset.find_Kth(0)で最小の要素を参照できる　最大値はset.find_Kth(set.size() - 1)<br>
+$\Theta(\log N)$ で動作する</p>
+<h3 id=countconst-t-x>count(const T &x)</h3>
+<p>xと等価な要素の個数を返す $\Theta(\log N)$</p>
+<h3 id=count_lowerconst-t-x>count_lower(const T &x)</h3>
+<p>x<strong>より小さい</strong>要素の個数を返す $\Theta(\log N)$</p>
+<h3 id=count_upperconst-t-x>count_upper(const T &x)</h3>
+<p>x<strong>より大きい</strong>要素の個数を返す $\Theta(\log N)$</p>
+<h3 id=list>list()</h3>
+<p>集合内の要素を昇順に並べたvectorを返す $\Theta(N)$<br>
+イテレータを実装していないので、集合内の要素をなめたいときにはこれを使う</p>
+<h3 id=merge_withavlset-r>merge_with(AVLSet &r)</h3>
+<p>$x \le y(x \in this, y \in r)$ が成り立つとき、thisにrをマージする $\Theta(\log N)$<br>
+マージ後、rは空になる<br>
+条件が厳しいのであまり使わない</p>
+<h3 id=splitint-k>split(int k)</h3>
+<p>thisのうち小さい方からk個を含むsetと、それ以外の要素からなるsetをpairにして返す $\Theta(\log N)$<br>
+適当に切ってあげることで集合のうち $x \in [l, r)$ であるような要素だけにクエリを投げたりできる　countシリーズやfind_Kthを使えば大体さばけるので使わない</p>
+<h2 id=内部での実装補助用の関数>内部での実装補助用の関数</h2>
+<h3 id=rotatenode-u>rotate(Node *u)</h3>
+<p>ノードuを中心に回転させる　rotate&lt;0>(u)で左回転 rotate&lt;1>(u)で右回転になる<br>
+左回転はuの左子を持ち上げる操作を指す<br>
+$O(1)$</p>
+<h3 id=balancenode-u>balance(Node *u)</h3>
+<p>uを根とするような木を平衡させる<br>
+ただし、uの左部分木、右部分木がともにAVL木であることと高さの差が$2$以下であることを仮定する<br>
+$O(1)$</p>
+<h3 id=isolate_nodenode-u>isolate_node(Node *u)</h3>
+<p>ノードuを木から切り離す　戻り値はuを切り離してできた木の根
+$\Theta(\log N)$</p>
+<h3 id=split_rightest_nodenode-v>split_rightest_node(Node *v)</h3>
+<p>ノードvを根とする木の最右ノードを木から切り離す<br>
+戻り値型はpairで、firstは最右ノードを切り離してできた木の根、secondは切り離された最右ノード<br>
+$\Theta(\log N)$</p>
+<h3 id=dump>dump()</h3>
+<p>デバッグ用　木を出力する</p>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2021/09/07/avl2/ class=larrow>
+AVL木書いた2
+</a>
+<a href=https://blog.toyama1710.net/posts/2021/08/26/help/ class=rarrow>
+08/26 日記
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>

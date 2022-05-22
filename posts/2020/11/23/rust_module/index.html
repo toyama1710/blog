@@ -1,0 +1,171 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>RustのモジュールシステムのTips | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="Rustのモジュールシステム、ググっても中々必要な情報に辿り着けないし調べ直すと手間だからハマったポイントについてまとめるぜ！">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2020/11/23/rust_module/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2020/11/23/rust_module/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="RustのモジュールシステムのTips">
+<meta property="og:description" content="Rustのモジュールシステム、ググっても中々必要な情報に辿り着けないし調べ直すと手間だからハマったポイントについてまとめるぜ！">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/img/default_thumbnail.png">
+<meta name=twitter:card content="summary">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>RustのモジュールシステムのTips</h1>
+<p class=meta><time datetime=2020-11-23T22:48:01+09:00>November 23, 2020</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/rust/ class=categories_item>Rust</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/rust/>Rust</a></li><li class=tags_item><a href=https://blog.toyama1710.net/tags/cargo/>Cargo</a></li>
+</ul>
+</div>
+</div>
+</header>
+<aside>
+<div class=toc>
+<details>
+<summary>Table of Contents</summary>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#複数の実行可能バイナリを1つのクレートにまとめる>複数の実行可能バイナリを1つのクレートにまとめる</a>
+<ul>
+<li><a href=#全てのバイナリで共通するモジュール>全てのバイナリで共通するモジュール</a></li>
+</ul>
+</li>
+<li><a href=#pub-use-でディレクトリ構造を変える>pub use でディレクトリ構造を変える</a></li>
+</ul>
+</nav>
+</details>
+</div>
+</aside><hr>
+<p>Rustのモジュールシステム、ググっても中々必要な情報に辿りつけなくて辛いです<br>
+自分がハマったポイントについてまとめます</p>
+<h2 id=複数の実行可能バイナリを1つのクレートにまとめる>複数の実行可能バイナリを1つのクレートにまとめる</h2>
+<p>クライアントとホストのプラグラムを1つのクレートにまとめたい、なんてときに使えます<br>
+depandeciesを1箇所にまとめられて便利</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-toml data-lang=toml><span class=p>[[</span><span class=nx>bin</span><span class=p>]]</span>
+<span class=nx>name</span> <span class=p>=</span> <span class=s2>&#34;host&#34;</span>
+<span class=nx>path</span> <span class=p>=</span> <span class=s2>&#34;src/host_src/main.rs&#34;</span>
+
+<span class=p>[[</span><span class=nx>bin</span><span class=p>]]</span>
+<span class=nx>name</span> <span class=p>=</span> <span class=s2>&#34;client&#34;</span>
+<span class=nx>path</span> <span class=p>=</span> <span class=s2>&#34;src/client_src/main.rs&#34;</span>
+</code></pre></div><p>Cargo.tomlにこんな感じに追記します<br>
+binテーブルの配列にパスと生成するバイナリファイルの名前を書けばいいです</p>
+<p>cargo run での実行は <code>cargo run --bin &lt;NAME></code> になります<br>
+生成されたバイナリは、上記の例のclientであれば target/debug/client か target/release/client にあります</p>
+<h3 id=全てのバイナリで共通するモジュール>全てのバイナリで共通するモジュール</h3>
+<p>今、クレートのディレクトリ構成が次のようだったとします</p>
+<pre tabindex=0><code>rust_ssh
+    └--src
+        ├--lib.rs
+        ├--cipher.rs
+        |
+        ├--host_src
+        |    └--main.rs
+        └--client_src
+             └--main.rs
+</code></pre><p>この時、host_src/main.rs と client_src/main.rs の双方からcipherモジュールを参照することを考えます</p>
+<p>これちょっと罠なんですが crate::cipher ではアクセスできなくて、rust_ssh::cipher でアクセスします</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-rust data-lang=rust><span class=k>use</span><span class=w> </span><span class=n>rust_ssh</span>::<span class=n>cipher</span><span class=p>;</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=k>fn</span> <span class=nf>main</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>    </span><span class=n>cipher</span>::<span class=n>encrypt</span><span class=p>();</span><span class=w>
+</span><span class=w></span><span class=p>}</span><span class=w>
+</span></code></pre></div><p>みたいな感じ<br>
+client も host も同じクレート内にあるんだから crate::cipher でアクセスできるに決まってるだろ！wって言ってたらハマりました</p>
+<h2 id=pub-use-でディレクトリ構造を変える>pub use でディレクトリ構造を変える</h2>
+<p>競技ミングのライブラリを書いているとよく</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-rust data-lang=rust><span class=k>use</span><span class=w> </span><span class=k>crate</span>::<span class=n>segment_tree</span>::<span class=n>lazy_segment_tree</span>::<span class=n>LazySegmentTree</span><span class=p>;</span><span class=w>
+</span></code></pre></div><p>みたいなuse句を書くことがあります<br>
+これを</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-rust data-lang=rust><span class=k>use</span><span class=w> </span><span class=k>crate</span>::<span class=n>segment_tree</span>::<span class=n>LazySegmentTree</span><span class=w>
+</span></code></pre></div><p>のように書けるようにします</p>
+<p>まず、次のようなディレクトリ構成を考えます</p>
+<pre tabindex=0><code>rs_library
+    └--src
+        ├--lib.rs
+        └--segment_tree
+              ├--mod.rs
+              ├--lazy_segment_tree.rs
+              ├--dual_segment_tree.rs
+              └--segment_tree.rs
+</code></pre><p>mod.rs は</p>
+<pre tabindex=0><code>pub mod lazy_segment_tree
+pub mod dual_segment_tree
+pub mod segment_tree
+</code></pre><p>となっているとします。<br>
+LazySegmentTree は lazy_segment_tree.rs で定義されている構造体です</p>
+<p>ここで、mod.rs を次のように書き換えます</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-rust data-lang=rust><span class=k>pub</span><span class=w> </span><span class=k>mod</span> <span class=nn>lazy_segment_tree</span><span class=w>
+</span><span class=w></span><span class=k>pub</span><span class=w> </span><span class=k>mod</span> <span class=nn>dual_segment_tree</span><span class=w>
+</span><span class=w></span><span class=k>pub</span><span class=w> </span><span class=k>mod</span> <span class=nn>segment_tree</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=k>pub</span><span class=w> </span><span class=k>use</span><span class=w> </span><span class=n>lazy_segment_tree</span>::<span class=o>*</span><span class=p>;</span><span class=w>
+</span><span class=w></span><span class=k>pub</span><span class=w> </span><span class=k>use</span><span class=w> </span><span class=n>dual_segment_tree</span>::<span class=o>*</span><span class=p>;</span><span class=w>
+</span><span class=w></span><span class=k>pub</span><span class=w> </span><span class=k>use</span><span class=w> </span><span class=n>segment_tree</span>::<span class=o>*</span><span class=p>;</span><span class=w>
+</span></code></pre></div><p>これで、crate::segment_tree::LazySegmentTree のようにして LazySegmentTree にアクセスできるようになりました</p>
+<p>pub use を使ってスコープに持ち込んだパスを外部に公開することで、ファイルを分割したままあたかも1つのファイルで定義されているかのように見せかけることができ、パスが冗長化するのを防ぐことができます</p>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2020/12/02/deployer/ class=larrow>
+簡易Deployerを実装しました
+</a>
+<a href=https://blog.toyama1710.net/posts/2020/11/22/abc184/ class=rarrow>
+ABC184 感想
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>

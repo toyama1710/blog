@@ -1,0 +1,400 @@
+.toc {
+  margin: 1.5em;
+  margin-top: 0em;
+}
+.toc > details > summary {
+  cursor: pointer;
+  color: #444;
+}
+.toc > details {
+}
+.toc > details[open] {
+    transition: all 10s;
+}
+
+.archive li {
+  font-size: 1.1em;
+}
+
+.archive time {
+  display: inline-block;
+  min-width: 10ch;
+  margin: 0 .2em;
+}
+
+.hidden {
+  display: none;
+}
+
+.more {
+  margin: 1em;
+  text-align: right;
+}
+
+.more a {
+  border-radius: 2px;
+  border: 1.5px solid #f34;
+  padding: .4em .8em;
+}
+
+.more a:hover {
+  color: #fff;
+  border-color: #9090e0;
+  background: #9090e0;
+  text-decoration: inherit;
+}
+
+.icons svg {
+  height: 1em;
+  width: 1em;
+  fill: currentColor;
+  transition: .2s color;
+  vertical-align: middle;
+  margin-bottom: .15em;
+}
+
+.tags, .categories {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  margin: 0;
+}
+
+.tags > p, .categories > p {
+  margin: 0;
+  padding: 0;
+  color: #555;
+  width: 6em;
+  text-align: right;
+}
+
+.tags > ul, .categories > ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.tags li, .categories li {
+  margin: 0;
+  padding: 0;
+  margin-left: 1.5em;
+}
+.categories li {
+  margin-left: 1.0em;
+}
+
+.categories_none, .tags_none {
+  color: #888;
+}
+
+.categories_none_list li, .tags_none_list li {
+    margin-left: 1.5em;
+}
+
+.tags li a {
+  position: relative;
+  display: inline-block;
+  padding: 0 1em;
+  background-color: #c66;
+  color: #fff;
+  font-size: 16px;
+  height: 20px;
+  line-height: 20px;
+  border-radius: 0 3px 3px 0;
+  font-weight: 400;
+  transition: 0.3;
+}
+
+.tags li a::before {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: -13px;
+  width: 0;
+  height: 0;
+  border-color: transparent #c66 transparent transparent;
+  border-style: solid;
+  border-width: 10px 13px 10px 0;
+  transition: 0.3;
+}
+
+.tags li a::after {
+  position: absolute;
+  top: 7px;
+  left: 0;
+  z-index: 3;
+  display: block;
+  content: '';
+  width: 5px;
+  height: 5px;
+  background-color: #fff;
+  border-radius: 100%;
+}
+.tags li a:hover {
+  background: #99e;
+  transition: 0.3;
+}
+.tags li a:hover::before {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: -13px;
+  width: 0;
+  height: 0;
+  border-color: transparent #99e transparent transparent;
+  border-style: solid;
+  border-width: 10px 13px 10px 0;
+  transition: 0.3;
+}
+
+.categories li a {
+  font-size: 16px;
+  height: 20px
+  line-height: 20px;
+  border-radius: 2px;
+  padding: 0 15px;
+  border: 2px solid #c66;
+  color: #c66;
+  transition: 0.3;
+}
+
+.categories li a:hover {
+  color: #fff;
+  border: 2px solid #99e;
+  background: #99e;
+}
+
+ul.term_list {
+  list-style-type: none;
+  padding-left: calc(20% - 3em);
+}
+
+.term_contenair {
+  display: flex;
+  text-align: center;
+  justify-content: space-between;
+  margin: 0;
+}
+
+.term_name {
+  box-sizing: border-box;
+  width: 40%;
+  font-size: 1.2em;
+  font-weight: 600;
+  text-align: left;
+  margin: 0;
+}
+.term_posts {
+  box-sizing: border-box;
+  width: 20%;
+  font-size: 1.2em;
+  margin: 0;
+}
+.term_link {
+  box-sizing: border-box;
+  width: 40%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+.term_link a {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+}
+
+.title {
+  font-size: 1.7em;
+  color: #0f0000;
+  margin: 0;
+  padding: 0;
+}
+
+.list_title {
+  color: #0f0000;
+}
+
+.meta {
+  margin: 0.5em 0;
+  padding: 0;
+}
+
+.summary {
+  margin: 0.2em;
+  padding: 0;
+  color: #111;
+}
+
+.page_list {
+  padding: 1.5em 0;
+  margin: 0;
+}
+
+.page_list + .page_list {
+  border-top: 2px solid #aaa;
+}
+
+.pagination {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.pagination p {
+  margin: 1em;
+}
+
+.pagination a {
+  margin: 0;
+  padding: 0;
+}
+
+.prev_next {
+  display: flex;
+  flex-flow: row wrap;
+  margin-top: 5em;
+}
+
+.larrow {
+  text-align: left;
+}
+.larrow:before {
+  content: "\025c0";
+}
+
+.rarrow {
+  text-align: right;
+  margin-left: auto;
+}
+.rarrow:after {
+  content: "\025b6";
+}
+
+.dark {
+  color: #fff;
+  background: #000;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #ef2121;
+  display: flex;
+  flex-flow: row wrap;
+  padding: 1.5em calc(30% - 8em);
+}
+
+.head_title {
+  margin: 0 1.8em;
+}
+.head_posts {
+  margin-left: auto;
+  color: #aaa;
+}
+.head_tags {
+  margin-left: 1.1em;
+  color: #aaa;
+}
+.head_categories {
+  margin: 0 1.1em;
+  color: #aaa;
+}
+
+@media screen and (max-width: 560px) {
+  .title {
+    font-size: 1.4em;
+  }
+  .term_contenair {
+    flex-wrap: wrap;
+    margin: 0.5em 0;
+  }
+  .term_name {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 1em;
+  }
+  .term_list p, .term_list .more {
+    padding: .3em 0;
+    margin: 0;
+  }
+  .term_posts {
+    box-sizing: border-box;
+    margin: 0;
+    padding-left: 2em;
+    text-align: left;
+    width: 40%;
+  }
+  .term_link {
+    box-sizing: border-box;
+    text-align: right;
+    width: auto;
+  }
+
+  .dark {
+    padding: 1.2em calc(30% - 8em);
+  }
+  .head_title {
+    text-align: center;
+    padding: 0;
+    padding-bottom: .4em;
+    margin: 5% 10%;
+    width: 80%;
+  }
+  .head_posts {
+    margin 5% auto 0 1em;
+  }
+  .head_tags {
+    margin-right: 1em;
+  }
+  .head_categories {
+    margin: 0;
+    margin-right: auto;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .title {
+    color: #fffffc;
+  }
+  .list_title {
+    color: #fffffc;
+  }
+  .summary {
+    color: #bbb;
+  }
+
+  .tags > p, .categories > p {
+    color: #c7c7c7;
+  }
+
+  .tags li a {
+    background-color: #e55;
+  }
+  .tags li a::before {
+    border-color: transparent #e55 transparent transparent;
+  }
+  .tags li a::after {
+    background-color: #141313;
+    top: 7px;
+    width: 6px;
+    height: 6px;
+  }
+  .tags li a:hover {
+    background: #99e;
+  }
+  .categories li a {
+    color: #e55;
+    border-color: #e55;
+    font-size: 1.02em;
+  }
+
+  .categories li a:hover {
+    color: #fff;
+  }
+  .toc > details > summary {
+    color: #c8c8c8;
+  }
+}

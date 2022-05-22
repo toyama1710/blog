@@ -1,0 +1,196 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>Test | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="テストページです">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2020/10/27/test/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2020/10/27/test/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="Test">
+<meta property="og:description" content="テストページです">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/img/default_thumbnail.png">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css integrity=sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq crossorigin=anonymous>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js integrity=sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js integrity=sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI crossorigin=anonymous onload=renderMathInElement(document.body)></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}]})})</script>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>Test</h1>
+<p class=meta><time datetime=2020-10-27T11:38:09+09:00>October 27, 2020</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/others/ class=categories_item>others</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/markdown/>markdown</a></li>
+</ul>
+</div>
+</div>
+</header>
+<aside>
+<div class=toc>
+<details>
+<summary>Table of Contents</summary>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#見出し1>見出し1</a>
+<ul>
+<li><a href=#見出し2>見出し2</a></li>
+</ul>
+</li>
+<li><a href=#フロントマター>フロントマター</a></li>
+<li><a href=#syntax-highlight-test>syntax highlight test</a></li>
+<li><a href=#math-test>math test</a></li>
+<li><a href=#md-の忘れそうな文法とか>md の忘れそうな文法とか</a></li>
+</ul>
+</nav>
+</details>
+</div>
+</aside><hr>
+<p>このブログはHugoで生成されています。
+これは各種機能のテストのために作ったページです。</p>
+<p>md の書き方とか自分用のドキュメントも兼ねてる</p>
+<h2 id=見出し1>見出し1</h2>
+<p><code>##</code> で <code>&lt;h2></code> 相当</p>
+<h3 id=見出し2>見出し2</h3>
+<p><code>###</code> で <code>&lt;h3></code> 相当<br>
+<code>#</code> は <code>&lt;h1></code> 相当なんですが自動生成される目次に使われない</p>
+<h2 id=フロントマター>フロントマター</h2>
+<p>md の先頭の <code>---</code> で囲まれたところに yaml 形式でいろんなパラメータを置いてく</p>
+<pre><code>toc: true
+</code></pre>
+<p>h1,h2とかを拾って目次を自動生成してくれる。</p>
+<pre><code>tags: [t1, t2, .... , tN]
+categories: [c1, c2, ... , cN]
+</code></pre>
+<p>タグとかカテゴリの設定</p>
+<pre><code>math: true
+</code></pre>
+<p>KaTeXを読み込む 数式を書かない記事ならfalseにしとくと若干読み込みが速い(はず)</p>
+<pre><code>description: &quot;abracadabra&quot;
+</code></pre>
+<p>記事の summary を手動設定する　設定しなくても勝手に最初の方の文章を拾ってくれる</p>
+<h2 id=syntax-highlight-test>syntax highlight test</h2>
+<p><code>```</code> でコードブロックを囲うといい感じにしてくれる。</p>
+<pre><code>```c++
+ここにプログラムを書く
+```
+</code></pre>
+<p>みたいな感じで言語名を書くとパースしてハイライトしてくれて嬉しい</p>
+<pre><code>```rust{linenos=table}
+fn main() {
+    println!(&quot;hello&quot;);
+}
+```
+</code></pre>
+<p>みたいにして行番号も付けられる</p>
+<p>C++コード</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=cp>#include</span> <span class=cpf>&lt;iostream&gt;</span><span class=cp>
+</span><span class=cp></span>
+<span class=cp>#define _overload(_1, _2, _3, _4, name, ...) name
+</span><span class=cp>#define _rep1(Itr, N) _rep3(Itr, 0, N, 1)
+</span><span class=cp>#define _rep2(Itr, a, b) _rep3(Itr, a, b, 1)
+</span><span class=cp>#define _rep3(Itr, a, b, step) for (i64 (Itr) = a; (Itr) &lt; b; (Itr) += step)
+</span><span class=cp>#define repeat(...) _overload(__VA_ARGS__, _rep3, _rep2, _rep1)(__VA_ARGS__)
+</span><span class=cp></span>
+<span class=k>using</span> <span class=k>namespace</span> <span class=n>std</span><span class=p>;</span>
+<span class=k>using</span> <span class=n>i64</span> <span class=o>=</span> <span class=kt>long</span> <span class=kt>long</span><span class=p>;</span>
+
+<span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+    <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=mi>3</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;hello0&#34;</span> <span class=o>&lt;&lt;</span> <span class=sc>&#39;\n&#39;</span><span class=p>;</span>
+    <span class=n>repeat</span><span class=p>(</span><span class=n>i</span><span class=p>,</span> <span class=mi>3</span><span class=p>)</span> <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;hello1&#34;</span> <span class=o>&lt;&lt;</span> <span class=sc>&#39;\n&#39;</span><span class=p>;</span>
+    <span class=n>repeat</span><span class=p>(</span><span class=n>i</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=mi>3</span><span class=p>)</span> <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;hello2&#34;</span> <span class=o>&lt;&lt;</span> <span class=sc>&#39;\n&#39;</span><span class=p>;</span>
+    <span class=n>repeat</span><span class=p>(</span><span class=n>i</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span> <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;hello3&#34;</span> <span class=o>&lt;&lt;</span> <span class=sc>&#39;\n&#39;</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><p>Rust コード</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-rust data-lang=rust><span class=k>fn</span> <span class=nf>main</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>    </span><span class=k>for</span><span class=w> </span><span class=n>i</span><span class=w> </span><span class=k>in</span><span class=w> </span><span class=mi>0</span><span class=o>..</span><span class=mi>3</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>        </span><span class=fm>println!</span><span class=p>(</span><span class=s>&#34;hello&#34;</span><span class=p>);</span><span class=w>
+</span><span class=w>    </span><span class=p>}</span><span class=w>
+</span><span class=w></span><span class=p>}</span><span class=w>
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id=math-test>math test</h2>
+<p><code>$$</code>で囲った数式をいい感じにしてくれる。<code>$</code> で囲った時はインライン表示する</p>
+<p>$$
+\KaTeX{}
+$$</p>
+<p>配列 $A, B$ の要素を適切に並べ替えて $\sum_{i=1}^{N} A_i \times B_i$ を最小化してください</p>
+<p>配列 <code>$A, B$</code> の要素を適切に並べ替えて <code>$\sum_{i=1}^{N} A_i \times B_i$</code> を最小化してください</p>
+<p>displaystyleとか使うと見慣れた感じにできる。</p>
+<p>配列 $A, B$ の要素を適切に並べ替えて $\displaystyle \sum_{i=1}^{N} A_i \times B_i$ を最小化してください</p>
+<p>配列 <code>$A, B$</code> の要素を適切に並べ替えて <code>$\displaystyle \sum_{i=1}^{N} A_i \times B_i$</code> を最小化してください</p>
+<h2 id=md-の忘れそうな文法とか>md の忘れそうな文法とか</h2>
+<p>空行は段落を切り替えるときに使って段落変えずに改行する時は <code>\</code> を使う(今まで混同してたのでメモ)</p>
+<p><code>&lt;pre></code> は文章の前に空白4つ入れると使える</p>
+<p><code>*</code>で囲むと <em>強調</em> になる 2つ使うともっと強い　<strong>FAKE</strong> とか書ける</p>
+<p>リンクは <code>[テキスト](URL)</code> で貼れる <a href=/>sample</a> <code>[sample](https://blog.toyama1710.net/)</code> <code>[sample](/)</code></p>
+<p>ほとんど同じ要領で画像も貼れる <code>![alt属性](画像URL)</code></p>
+<p>HTMLコードもそのまま書ける 画像のサイズ調整とか必要になったら <code>&lt;img></code> タグで画像を貼る</p>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2020/11/16/abc183/ class=larrow>
+ABC183 感想
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>

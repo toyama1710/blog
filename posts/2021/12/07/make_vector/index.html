@@ -1,0 +1,105 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>多次元のvector作るやつ | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="遠山のブログ">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2021/12/07/make_vector/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2021/12/07/make_vector/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="多次元のvector作るやつ">
+<meta property="og:description" content="コード 概要 before: vector<vector<vector<T>>> vec = vector<vector<vector<T>>>(n1, vector<vector<T>>(n2, vector<T>(n3, e))); after: auto vec = make_vector({n1, n2, n3}, e); N次元vectorの宣言に$\Theta (N^2)$回もvectorって書きたくないので嬉しくなっ">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/img/default_thumbnail.png">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css integrity=sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq crossorigin=anonymous>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js integrity=sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js integrity=sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI crossorigin=anonymous onload=renderMathInElement(document.body)></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}]})})</script>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>多次元のvector作るやつ</h1>
+<p class=meta><time datetime=2021-12-07T21:19:49+09:00>December 07, 2021</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/%e7%ab%b6%e3%83%97%e3%83%ad/ class=categories_item>競プロ</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/%e3%83%a9%e3%82%a4%e3%83%96%e3%83%a9%e3%83%aa/>ライブラリ</a></li>
+</ul>
+</div>
+</div>
+</header><hr>
+<p><a href=https://toyama1710.github.io/cpp_library/util/make_vector.hpp>コード</a></p>
+<h2 id=概要>概要</h2>
+<p>before:</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=n>vector</span><span class=o>&lt;</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;&gt;&gt;</span> <span class=n>vec</span> <span class=o>=</span> <span class=n>vector</span><span class=o>&lt;</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;&gt;&gt;</span><span class=p>(</span><span class=n>n1</span><span class=p>,</span> <span class=n>vector</span><span class=o>&lt;</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;&gt;</span><span class=p>(</span><span class=n>n2</span><span class=p>,</span> <span class=n>vector</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=p>(</span><span class=n>n3</span><span class=p>,</span> <span class=n>e</span><span class=p>)));</span>
+</code></pre></div><p>after:</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>auto</span> <span class=n>vec</span> <span class=o>=</span> <span class=n>make_vector</span><span class=p>({</span><span class=n>n1</span><span class=p>,</span> <span class=n>n2</span><span class=p>,</span> <span class=n>n3</span><span class=p>},</span> <span class=n>e</span><span class=p>);</span>
+</code></pre></div><p>N次元vectorの宣言に$\Theta (N^2)$回もvectorって書きたくないので嬉しくなった<br>
+<code>make_vector({n1, n2, n3}, 0);</code> と <code>make_vector({n1, n2, n3}, 0ll);</code> は等価ではないので注意(前者はint型で後者はlong long)<br>
+要素数の指定でキャストの嵐になることもあるけどwarning無視したりRustも似たようなものだしなって思ったりすると辛さが薄れる<br>
+<code>make_vector&lt;long long>({n1, n2, n3}, 0)</code> みたいに呼び出した方が安全かもしれない</p>
+<h2 id=気持ちとか>気持ちとか</h2>
+<p>戻り値の型をautoで推論できるのラムダ式だけだと思ってたので最近まで諦めてた<br>
+実行時に型が決まるような仕組みではないので、テンプレート引数Nで次元の数を指定して 1次元, 2次元, 3次元&mldr;. のそれぞれの場合で違う関数になるようにしてる</p>
+<p>可変引数テンプレートを使った方が実装は楽　その場合 <code>auto vec = make_vector(n1, n2, n3, e);</code> って書くことになるのでうっかり初期値を書き忘れて <code>auto vec = make_vector(n1, n2, n3);</code> とか書いてしまってもコンパイラでミスを検知できない<br>
+自分の実装は妙にテクニカルになってしまったのでまあ一長一短</p>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2021/12/09/bit_op/ class=larrow>
+bit演算シリーズ
+</a>
+<a href=https://blog.toyama1710.net/posts/2021/11/24/rev_cmp/ class=rarrow>
+RevCmp
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>

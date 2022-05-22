@@ -1,0 +1,112 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>ARC108 感想 | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="遠山のブログ">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2020/11/21/arc108/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2020/11/21/arc108/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="ARC108 感想">
+<meta property="og:description" content="653rd/4237 でパフォ1701 ARC108 の感想です 前回大きくレート上げたからか思ってたよりレート上がらなくてちょい辛い A.Sum and Product 問題リンク 問題文に書いてあるとおり $P$">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/img/default_thumbnail.png">
+<meta name=twitter:card content="summary">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css integrity=sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq crossorigin=anonymous>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js integrity=sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js integrity=sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI crossorigin=anonymous onload=renderMathInElement(document.body)></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}]})})</script>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>ARC108 感想</h1>
+<p class=meta><time datetime=2020-11-21T23:16:31+09:00>November 21, 2020</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/%e7%ab%b6%e3%83%97%e3%83%ad/ class=categories_item>競プロ</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/atcoder/>AtCoder</a></li>
+</ul>
+</div>
+</div>
+</header><hr>
+<p>653rd/4237 でパフォ1701</p>
+<p><a href=https://atcoder.jp/contests/arc108>ARC108</a> の感想です</p>
+<p>前回大きくレート上げたからか思ってたよりレート上がらなくてちょい辛い</p>
+<h2 id=asum-and-product>A.Sum and Product</h2>
+<p><a href=https://atcoder.jp/contests/arc108/tasks/arc108_a>問題リンク</a></p>
+<p>問題文に書いてあるとおり $P$ の約数を見ればよし $O(\sqrt P)$</p>
+<h2 id=babbreviate-fox>B.Abbreviate Fox</h2>
+<p><a href=https://atcoder.jp/contests/arc108/tasks/arc108_b>問題リンク</a></p>
+<p>めっちゃ<a href=https://atcoder.jp/contests/agc005/tasks/agc005_a>これ</a>に似てる<br>
+操作の順番が答えに影響しないのでfoxが出てくるたびに貪欲に取り除いていって良い<br>
+vectorでも使ってスタックでシミュレートしてあげれば $O(N)$</p>
+<h2 id=ckeep-graph-connected>C.Keep Graph Connected</h2>
+<p><a href=https://atcoder.jp/contests/arc108/tasks/arc108_c>問題リンク</a></p>
+<p>まず、サンプルに &ldquo;No&rdquo; のケースが無いので &ldquo;No&rdquo; は無いとして考える<br>
+頂点につけた番号が $C_i$ と同じかどうかのbool値を割り当てると二部グラフに似てる<br>
+どうせvalidな割り当てのbool値を反転してもvalidな割り当てが存在してるので頂点$1$からDFSしながら適当に番号を振っていけば良い</p>
+<p>証明: AC</p>
+<p>順位表見てるとなんか通されすぎてる気がするし正当性もちょっと怪しいけどまあ正しそうだしでダメ元で適当にコード書いて出したら通って草って感じだった</p>
+<h2 id=d以降>D以降</h2>
+<p>Dで16通りくらい場合分けしてたんだけどよくわからなくて飛ばす</p>
+<p>Eもよくわからん　トップ層も解けてないしこんなん解けるか！って言って飛ばす</p>
+<p>Fは割と希望が見える　とりあえず木の直径を軸に考えるべきですねってのはわかる　maxの距離を取る対のうち片方は葉にあるだろうなってところで思考が止まっておしまい</p>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2020/11/22/abc184/ class=larrow>
+ABC184 感想
+</a>
+<a href=https://blog.toyama1710.net/posts/2020/11/16/abc183/ class=rarrow>
+ABC183 感想
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>セグメント木 | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="セグ木のライブラリのドキュメント">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2020/12/21/segtree/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2020/12/21/segtree/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="セグメント木">
+<meta property="og:description" content="セグ木のライブラリのドキュメント">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/img/default_thumbnail.png">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css integrity=sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq crossorigin=anonymous>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js integrity=sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js integrity=sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI crossorigin=anonymous onload=renderMathInElement(document.body)></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}]})})</script>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>セグメント木</h1>
+<p class=meta><time datetime=2020-12-21T02:07:22+09:00>December 21, 2020</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/%e7%ab%b6%e3%83%97%e3%83%ad/ class=categories_item>競プロ</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/%e3%83%a9%e3%82%a4%e3%83%96%e3%83%a9%e3%83%aa/>ライブラリ</a></li>
+</ul>
+</div>
+</div>
+</header>
+<aside>
+<div class=toc>
+<details>
+<summary>Table of Contents</summary>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#segmenttree>SegmentTree</a>
+<ul>
+<li><a href=#monoid>Monoid</a></li>
+<li><a href=#コンストラクタ>コンストラクタ</a></li>
+<li><a href=#foldl-r>fold(l, r)</a></li>
+<li><a href=#updatek-dat>update(k, dat)</a></li>
+<li><a href=#searchl-fn>search(l, fn)</a></li>
+</ul>
+</li>
+<li><a href=#dualsegmenttree>DualSegmentTree</a>
+<ul>
+<li><a href=#monoid-1>Monoid</a></li>
+<li><a href=#コンストラクタ-1>コンストラクタ</a></li>
+<li><a href=#updatel-r-op>update(l, r, op)</a></li>
+<li><a href=#getk>get(k)</a></li>
+</ul>
+</li>
+<li><a href=#lazysegmenttree>LazySegmentTree</a>
+<ul>
+<li><a href=#monoidwithoperator>MonoidwithOperator</a></li>
+<li><a href=#updatel-r-op-1>update(l, r, op)</a></li>
+<li><a href=#setk-dat>set(k, dat)</a></li>
+<li><a href=#foldl-r-1>fold(l, r)</a></li>
+</ul>
+</li>
+<li><a href=#segmenttree2d>SegmentTree2D</a></li>
+<li><a href=#dynamicsegmenttree>DynamicSegmentTree</a></li>
+<li><a href=#persistentsegmenttree>PersistentSegmentTree</a></li>
+</ul>
+</nav>
+</details>
+</div>
+</aside><hr>
+<p>TODO: 書き切る<br>
+2次元セグ木以降は随時更新のつもり</p>
+<h2 id=segmenttree>SegmentTree</h2>
+<p>空間: $O(N)$ (より正確にはちょうど $2N$)</p>
+<p>いわゆる普通のセグ木<br>
+1点更新/区間取得が $O(log N)$</p>
+<h3 id=monoid>Monoid</h3>
+<p>template の Monoid が満たすべき要件は以下</p>
+<ul>
+<li>演算対象のデータの型を Monoid::value_type (以降 T ) とする</li>
+<li>T の二項演算を operation() として定義</li>
+<li>(T, operation()) の単位元を identity() として定義</li>
+</ul>
+<p>コードにすると次のようになる</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=k>struct</span> <span class=nc>M</span> <span class=p>{</span>
+    <span class=k>using</span> <span class=n>value_type</span> <span class=o>=</span> <span class=n>T</span><span class=p>;</span>
+    <span class=k>static</span> <span class=n>T</span> <span class=nf>identity</span><span class=p>()</span> <span class=p>{</span> <span class=k>return</span> <span class=n>T</span><span class=p>();</span> <span class=p>};</span>
+    <span class=k>static</span> <span class=n>T</span> <span class=nf>operation</span><span class=p>(</span><span class=n>T</span> <span class=n>lhs</span><span class=p>,</span> <span class=n>T</span> <span class=n>rhs</span><span class=p>)</span> <span class=p>{</span> <span class=k>return</span> <span class=n>lhs</span> <span class=o>+</span> <span class=n>rhs</span><span class=p>;</span> <span class=p>};</span>
+<span class=p>};</span>
+</code></pre></div><h3 id=コンストラクタ>コンストラクタ</h3>
+<p>要素数を指定して単位元で埋められてセグ木を指定するものと、要素の列を iterator で渡して初期化するものの 2 種類<br>
+ともに $O(N)$</p>
+<h3 id=foldl-r>fold(l, r)</h3>
+<p>時間: $O(log N)$</p>
+<p>区間 $[l, r)$ を左からfoldしていく<br>
+<code>for i in [l, r) { s += arr[i]; }</code> みたいな感じ</p>
+<h3 id=updatek-dat>update(k, dat)</h3>
+<p>時間: $O(log N)$</p>
+<p>k 番目の要素を dat で上書きする</p>
+<h3 id=searchl-fn>search(l, fn)</h3>
+<p>時間: $O(log N)$</p>
+<p>fn: T を 1 つだけ引数にとりboolを返す関数</p>
+<p>fn(fold(l, i)) が true になるような最初の i を返す<br>
+そのような i が存在しない場合 -1 を返す</p>
+<h2 id=dualsegmenttree>DualSegmentTree</h2>
+<p>空間: $O(N)$</p>
+<p>双対セグ木<br>
+区間更新/1点取得が $O(log N)$</p>
+<h3 id=monoid-1>Monoid</h3>
+<p>SegmentTree と同じ</p>
+<h3 id=コンストラクタ-1>コンストラクタ</h3>
+<p>要素数 n の単位元で埋まったセグ木を作る</p>
+<h3 id=updatel-r-op>update(l, r, op)</h3>
+<p>時間: $O(log N)$</p>
+<p>区間 $[l, r)$ に op を作用させる</p>
+<h3 id=getk>get(k)</h3>
+<p>左から k 番目のデータを取得</p>
+<h2 id=lazysegmenttree>LazySegmentTree</h2>
+<p>空間: $O(N)$</p>
+<p>遅延伝播セグメント木<br>
+区間更新/区間取得が $O(log N)$</p>
+<h3 id=monoidwithoperator>MonoidwithOperator</h3>
+<p>SegmentTree の Monoid と同じように定義された型 M と O があるとする<br>
+M は fold したいモノイドで、O は作用素<br>
+下のコードのようにして値、作用素、2者の演算を定義する</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=k>struct</span> <span class=nc>A</span> <span class=p>{</span>
+    <span class=k>using</span> <span class=n>value_structure</span> <span class=o>=</span> <span class=n>M</span><span class=p>;</span>
+    <span class=k>using</span> <span class=n>operator_structure</span> <span class=o>=</span> <span class=n>O</span><span class=p>;</span>
+    <span class=k>using</span> <span class=n>T</span> <span class=o>=</span> <span class=k>typename</span> <span class=n>M</span><span class=o>::</span><span class=n>value_type</span><span class=p>;</span>
+    <span class=k>using</span> <span class=n>E</span> <span class=o>=</span> <span class=k>typename</span> <span class=n>O</span><span class=o>::</span><span class=n>value_type</span><span class=p>;</span>
+    <span class=k>static</span> <span class=n>T</span> <span class=nf>operation</span><span class=p>(</span><span class=n>T</span> <span class=n>dat</span><span class=p>,</span> <span class=n>E</span> <span class=n>op</span><span class=p>)</span> <span class=p>{</span>
+        <span class=k>return</span> <span class=n>dat</span> <span class=o>+</span> <span class=n>op</span><span class=p>;</span>
+    <span class=p>};</span>
+<span class=p>};</span>
+</code></pre></div><p>ただし、T, E はサンプルコードを簡単にするためのものでテンプレート引数の要件には含まれない</p>
+<h3 id=updatel-r-op-1>update(l, r, op)</h3>
+<p>時間: $O(log N)$</p>
+<p>区間 [l, r) に作用素 op を作用させる</p>
+<h3 id=setk-dat>set(k, dat)</h3>
+<p>時間: $O(log N)$</p>
+<p>左から k 番目の要素を dat で上書きする</p>
+<h3 id=foldl-r-1>fold(l, r)</h3>
+<p>時間: $O(log N)$</p>
+<p>区間 [l, r) を左から fold していく</p>
+<h2 id=segmenttree2d>SegmentTree2D</h2>
+<p>2次元セグ木</p>
+<h2 id=dynamicsegmenttree>DynamicSegmentTree</h2>
+<p>必要なところだけつくるセグ木<br>
+座圧したいけどオンラインなので辛い、みたいなときに使う</p>
+<h2 id=persistentsegmenttree>PersistentSegmentTree</h2>
+<p>永続セグ木</p>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2020/12/27/diary/ class=larrow>
+12/26 日記
+</a>
+<a href=https://blog.toyama1710.net/posts/2020/12/10/alds/ class=rarrow>
+AOJ ALDS1 を Rust で全埋めしたので感想
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>

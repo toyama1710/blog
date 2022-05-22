@@ -1,0 +1,145 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>ダブリングでLCA求めるやつ(DoublingTree) | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="遠山のブログ">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2021/09/08/doubling_tree/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2021/09/08/doubling_tree/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="ダブリングでLCA求めるやつ(DoublingTree)">
+<meta property="og:description" content="DoublingTreeのドキュメント LCAを求めたり木上の任意の2ノード間の距離を $\Theta(\log N)$ で計算したりできる doubling_tree.hpp">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/img/default_thumbnail.png">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css integrity=sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq crossorigin=anonymous>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js integrity=sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js integrity=sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI crossorigin=anonymous onload=renderMathInElement(document.body)></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}]})})</script>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>ダブリングでLCA求めるやつ(DoublingTree)</h1>
+<p class=meta><time datetime=2021-09-08T23:59:11+09:00>September 08, 2021</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/%e7%ab%b6%e3%83%97%e3%83%ad/ class=categories_item>競プロ</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/%e3%83%a9%e3%82%a4%e3%83%96%e3%83%a9%e3%83%aa/>ライブラリ</a></li>
+</ul>
+</div>
+</div>
+</header>
+<aside>
+<div class=toc>
+<details>
+<summary>Table of Contents</summary>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#doublingtree>DoublingTree</a>
+<ul>
+<li><a href=#コンストラクタ>コンストラクタ</a></li>
+<li><a href=#lcaint-u-int-v>lca(int u, int v)</a></li>
+<li><a href=#climbint-u-int-d>climb(int u, int d)</a></li>
+<li><a href=#distanceint-u-int-v>distance(int u, int v)</a></li>
+</ul>
+</li>
+<li><a href=#doublingtreebuilder>DoublingTreeBuilder</a>
+<ul>
+<li><a href=#コンストラクタ-1>コンストラクタ</a></li>
+<li><a href=#add_edgeint-u-int-v>add_edge(int u, int v)</a></li>
+<li><a href=#buildconst-vectorint-root--0>build(const vector&lt;int> &root = {0})</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+</details>
+</div>
+</aside><hr>
+<p><a href=https://toyama1710.github.io/cpp_library/tree/doubling_tree.hpp>DoublingTree</a>のドキュメント<br>
+LCAを求めたり木上の任意の2ノード間の距離を $\Theta(\log N)$ で計算したりできる</p>
+<p>doubling_tree.hppにはDoublingTreeクラスとDoublingTreeBuilderクラスを定義してある</p>
+<h2 id=doublingtree>DoublingTree</h2>
+<h3 id=コンストラクタ>コンストラクタ</h3>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>template</span><span class=o>&lt;</span><span class=k>class</span> <span class=nc>InputItr</span><span class=o>&gt;</span>
+<span class=n>DoublingTree</span><span class=p>(</span><span class=n>InputItr</span> <span class=n>first</span><span class=p>,</span> <span class=n>InputItr</span> <span class=n>last</span><span class=p>)</span>
+</code></pre></div><p>vector&lt;optional&lt;int>>をiteratorで渡す (list&lt;optional&lt;long long>>とかでも動くと思うけどverifyしとらん)<br>
+DoublingTree(v.begin(), v.end())みたいに呼び出す<br>
+v[i]には頂点iの親が入る 頂点iが根の場合は親がないのでnulloptをいれておく</p>
+<h3 id=lcaint-u-int-v>lca(int u, int v)</h3>
+<p>頂点u,vのLowestCommonAncestorを求める $\Theta(\log N)$<br>
+u, vが連結でない場合の動作は未定義</p>
+<h3 id=climbint-u-int-d>climb(int u, int d)</h3>
+<p>戻り値の型はoptional&lt;int><br>
+頂点uを根方向にd個遡った頂点を返すが、もしも根を飛び越してしまうような場合にはnulloptを返す $\Theta(\log N)$</p>
+<h3 id=distanceint-u-int-v>distance(int u, int v)</h3>
+<p>頂点u, vの距離をintで返す $\Theta(\log N)$<br>
+u, vが連結でない場合の動作は未定義</p>
+<h2 id=doublingtreebuilder>DoublingTreeBuilder</h2>
+<p>入力形式によってはDoublingTreeのコンストラクタが扱いにくいので作った補助クラス</p>
+<h3 id=コンストラクタ-1>コンストラクタ</h3>
+<p>DoublingTreeBuilder(n)で頂点数n個の木を作る<br>
+最初、どの頂点も辺で接続されていない</p>
+<h3 id=add_edgeint-u-int-v>add_edge(int u, int v)</h3>
+<p>頂点u,vを直接結ぶ辺を追加する</p>
+<h3 id=buildconst-vectorint-root--0>build(const vector&lt;int> &root = {0})</h3>
+<p>指定した頂点を根としてDoublingTreeを構築して返してくれる<br>
+森を扱うことを考えて根は複数指定できるようにしてある</p>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2021/09/13/modint/ class=larrow>
+ModInt書いた
+</a>
+<a href=https://blog.toyama1710.net/posts/2021/09/07/avl2/ class=rarrow>
+AVL木書いた2
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>

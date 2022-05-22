@@ -1,0 +1,211 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>bit演算シリーズ | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="遠山のブログ">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2021/12/09/bit_op/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2021/12/09/bit_op/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="bit演算シリーズ">
+<meta property="og:description" content="bit/clz.hpp, bit/ctz.hpp, bit/msb.hpp, bit/lsb.hpp, bit/pop_count.hpp のドキュメント ビルトイン関数を使えば良いです速いし それらが使えない処理系のための実装を提供するのと、__builtin_ctz(0">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/img/default_thumbnail.png">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css integrity=sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq crossorigin=anonymous>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js integrity=sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js integrity=sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI crossorigin=anonymous onload=renderMathInElement(document.body)></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}]})})</script>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>bit演算シリーズ</h1>
+<p class=meta><time datetime=2021-12-09T20:50:04+09:00>December 09, 2021</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/%e7%ab%b6%e3%83%97%e3%83%ad/ class=categories_item>競プロ</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/%e3%83%a9%e3%82%a4%e3%83%96%e3%83%a9%e3%83%aa/>ライブラリ</a></li>
+</ul>
+</div>
+</div>
+</header>
+<aside>
+<div class=toc>
+<details>
+<summary>Table of Contents</summary>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#外から呼ぶやつ>外から呼ぶやつ</a>
+<ul>
+<li><a href=#int-clz64uint64_t>int clz64(uint64_t)</a>
+<ul>
+<li><a href=#sample>sample</a></li>
+</ul>
+</li>
+<li><a href=#int-clz32uint32_t>int clz32(uint32_t)</a></li>
+<li><a href=#int-ctz64uint64_t>int ctz64(uint64_t)</a>
+<ul>
+<li><a href=#sample-1>sample</a></li>
+</ul>
+</li>
+<li><a href=#int-ctz32uint32_t>int ctz32(uint32_t)</a></li>
+<li><a href=#uint64_t-msb64uint64_t>uint64_t msb64(uint64_t)</a>
+<ul>
+<li><a href=#sample-2>sample</a></li>
+</ul>
+</li>
+<li><a href=#uint32_t-msb32uint32_t>uint32_t msb32(uint32_t)</a></li>
+<li><a href=#uint64_t-lsb64uint64_t>uint64_t lsb64(uint64_t)</a>
+<ul>
+<li><a href=#sample-3>sample</a></li>
+</ul>
+</li>
+<li><a href=#uint32_t-lsb32uint32_t>uint32_t lsb32(uint32_t)</a></li>
+<li><a href=#int-popcnt64uint64_t>int popcnt64(uint64_t)</a>
+<ul>
+<li><a href=#sample-4>sample</a></li>
+</ul>
+</li>
+<li><a href=#int-popcnt32uint32_t>int popcnt32(uint32_t)</a></li>
+</ul>
+</li>
+<li><a href=#ビルトイン関数が使えないとき用の実装たち>ビルトイン関数が使えないとき用の実装たち</a>
+<ul>
+<li><a href=#int-clz64_uint64_t>int clz64_(uint64_t)</a></li>
+<li><a href=#int-ctz64_uint64_t>int ctz64_(uint64_t)</a></li>
+<li><a href=#uint64_t-msb64_uint64_t>uint64_t msb64_(uint64_t)</a></li>
+<li><a href=#uint64_t-lsb64_uint64_t>uint64_t lsb64_(uint64_t)</a></li>
+<li><a href=#int-popcnt64uint64_t-1>int popcnt64(uint64_t)</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+</details>
+</div>
+</aside><hr>
+<p><a href=https://toyama1710.github.io/cpp_library/bit/clz.hpp>bit/clz.hpp</a>,
+<a href=https://toyama1710.github.io/cpp_library/bit/ctz.hpp>bit/ctz.hpp</a>,
+<a href=https://toyama1710.github.io/cpp_library/bit/msb.hpp>bit/msb.hpp</a>,
+<a href=https://toyama1710.github.io/cpp_library/bit/lsb.hpp>bit/lsb.hpp</a>,
+<a href=https://toyama1710.github.io/cpp_library/bit/pop_count.hpp>bit/pop_count.hpp</a>
+のドキュメント</p>
+<p>ビルトイン関数を使えば良いです速いし<br>
+それらが使えない処理系のための実装を提供するのと、<code>__builtin_ctz(0);</code>などが未定義動作なので安全に使えるようにするのを目的に作ったライブラリ</p>
+<h2 id=外から呼ぶやつ>外から呼ぶやつ</h2>
+<h3 id=int-clz64uint64_t>int clz64(uint64_t)</h3>
+<p>64bit版のcount leading zero
+最上位bitからいくつ0が連続してるか数える</p>
+<h4 id=sample>sample</h4>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=n>assert</span><span class=p>(</span><span class=n>clz64</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span> <span class=o>==</span> <span class=mi>64</span><span class=p>);</span>
+<span class=n>assert</span><span class=p>(</span><span class=n>clz64</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=o>==</span> <span class=mi>63</span><span class=p>);</span>
+<span class=n>assert</span><span class=p>(</span><span class=n>clz64</span><span class=p>(</span><span class=mi>1ull</span> <span class=o>&lt;&lt;</span> <span class=mi>63</span><span class=p>)</span> <span class=o>==</span> <span class=mi>0</span><span class=p>);</span>
+</code></pre></div><h3 id=int-clz32uint32_t>int clz32(uint32_t)</h3>
+<p>clz64の32bit版</p>
+<h3 id=int-ctz64uint64_t>int ctz64(uint64_t)</h3>
+<p>64bit版のcount trailing zero
+最下位bitからいくつ0が連続してるか数える</p>
+<h4 id=sample-1>sample</h4>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=n>assert</span><span class=p>(</span><span class=n>ctz64</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span> <span class=o>==</span> <span class=mi>64</span><span class=p>);</span>
+<span class=n>assert</span><span class=p>(</span><span class=n>ctz64</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=o>==</span> <span class=mi>0</span><span class=p>);</span>
+<span class=n>assert</span><span class=p>(</span><span class=n>clz64</span><span class=p>(</span><span class=mi>1ull</span> <span class=o>&lt;&lt;</span> <span class=mi>63</span><span class=p>)</span> <span class=o>==</span> <span class=mi>63</span><span class=p>);</span>
+</code></pre></div><h3 id=int-ctz32uint32_t>int ctz32(uint32_t)</h3>
+<p>32bit版のctz64</p>
+<h3 id=uint64_t-msb64uint64_t>uint64_t msb64(uint64_t)</h3>
+<p>64bit符号なし整数からMSBを取り出す
+一番左の立ってるbitの抽出</p>
+<h4 id=sample-2>sample</h4>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=n>assert</span><span class=p>(</span><span class=n>msb64</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span> <span class=o>==</span> <span class=mi>0</span><span class=p>);</span>
+<span class=n>assert</span><span class=p>(</span><span class=n>msb64</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=o>==</span> <span class=mi>1</span><span class=p>);</span>
+<span class=n>assert</span><span class=p>(</span><span class=n>msb64</span><span class=p>(</span><span class=mh>0xf</span><span class=p>)</span> <span class=o>==</span> <span class=mh>0x8</span><span class=p>);</span>
+</code></pre></div><h3 id=uint32_t-msb32uint32_t>uint32_t msb32(uint32_t)</h3>
+<p>32bit版のmsb64</p>
+<h3 id=uint64_t-lsb64uint64_t>uint64_t lsb64(uint64_t)</h3>
+<p>64bit符号なし整数からMSBを取り出す
+一番右の立ってるbitの抽出</p>
+<h4 id=sample-3>sample</h4>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=n>assert</span><span class=p>(</span><span class=n>lsb64</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span> <span class=o>==</span> <span class=mi>0</span><span class=p>);</span>
+<span class=n>assert</span><span class=p>(</span><span class=n>lsb64</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=o>==</span> <span class=mi>1</span><span class=p>);</span>
+<span class=n>assert</span><span class=p>(</span><span class=n>lsb64</span><span class=p>(</span><span class=mi>6</span><span class=p>)</span> <span class=o>==</span> <span class=mi>2</span><span class=p>);</span>
+</code></pre></div><h3 id=uint32_t-lsb32uint32_t>uint32_t lsb32(uint32_t)</h3>
+<p>32bit版のlsb64</p>
+<h3 id=int-popcnt64uint64_t>int popcnt64(uint64_t)</h3>
+<p>64bit版のpop count　立ってるbitの数を返す</p>
+<h4 id=sample-4>sample</h4>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=n>assert</span><span class=p>(</span><span class=n>popcnt64</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span> <span class=o>==</span> <span class=mi>0</span><span class=p>);</span>
+<span class=n>assert</span><span class=p>(</span><span class=n>popcnt64</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=o>==</span> <span class=mi>1</span><span class=p>);</span>
+<span class=n>assert</span><span class=p>(</span><span class=n>popcnt64</span><span class=p>((</span><span class=mi>1ull</span> <span class=o>&lt;&lt;</span> <span class=mi>50</span><span class=p>)</span> <span class=o>-</span> <span class=mi>1</span><span class=p>)</span> <span class=o>==</span> <span class=mi>50</span><span class=p>);</span>
+</code></pre></div><h3 id=int-popcnt32uint32_t>int popcnt32(uint32_t)</h3>
+<p>popcnt64の32bit版</p>
+<h2 id=ビルトイン関数が使えないとき用の実装たち>ビルトイン関数が使えないとき用の実装たち</h2>
+<p>本編</p>
+<h3 id=int-clz64_uint64_t>int clz64_(uint64_t)</h3>
+<p>MSBを抽出する　0を除くとこれは64種類しかない(1が立ってるbitは1bitだけ)のでこれをうまく0~63に変換して表引きしてやればOK<br>
+うまく変換のパートはDe Bruijin Sequenceを使うと乗算でできる</p>
+<h3 id=int-ctz64_uint64_t>int ctz64_(uint64_t)</h3>
+<p>LSBを抽出したらあとはclz64_と同じ</p>
+<h3 id=uint64_t-msb64_uint64_t>uint64_t msb64_(uint64_t)</h3>
+<p>最下位bitからMSBまで1で埋まってるデータ(aとする)を作って <code>a ^ (a >> 1)</code> でMSBより下のbitを消去する方針</p>
+<p>データを作るパートが本質で、これはMSBを始点に1で埋まってる幅を倍々にしていくと $\Theta(\log w)$ 回程度のbit演算で可能</p>
+<h3 id=uint64_t-lsb64_uint64_t>uint64_t lsb64_(uint64_t)</h3>
+<p><code>bit & (~bit + 1)</code><br>
+2の補数表現を仮定すると <code>bit & -bit</code> とも書ける</p>
+<h3 id=int-popcnt64uint64_t-1>int popcnt64(uint64_t)</h3>
+<p>bit並列に数え上げる</p>
+<p>偶数bitと奇数bitに分けて1bitずらして足すと、データを2bitずつ区切ったときそれぞれ1がいくつあるか数えられる<br>
+次は2bitずらして足して 4bitずらして足して&mldr;.. としていくと最終的に64bit中に1がいくつあるかわかる</p>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2021/12/07/make_vector/ class=rarrow>
+多次元のvector作るやつ
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>

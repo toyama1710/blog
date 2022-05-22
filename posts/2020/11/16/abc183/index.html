@@ -1,0 +1,117 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>ABC183 感想 | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="成功したのでイキります AtCoder Beginner Contest 183 の感想">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2020/11/16/abc183/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2020/11/16/abc183/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="ABC183 感想">
+<meta property="og:description" content="成功したのでイキります AtCoder Beginner Contest 183 の感想">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/img/default_thumbnail.png">
+<meta name=twitter:card content="summary">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>ABC183 感想</h1>
+<p class=meta><time datetime=2020-11-16T09:55:25+09:00>November 16, 2020</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/%e7%ab%b6%e3%83%97%e3%83%ad/ class=categories_item>競プロ</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/atcoder/>AtCoder</a></li>
+</ul>
+</div>
+</div>
+</header><hr>
+<p><a href=https://atcoder.jp/contests/abc183>ABC183</a> で成功したのでイキります<br>
+54分で全完 230th/7199</p>
+<p>体感難易度は A &lt; F &lt; C = D &lt; E &lt;= B</p>
+<p>正直このセットならパフォ2200以上を出せないとな〜って感じ<br>
+Eでバグらせなければ30分台で全完できるはずなんだよな</p>
+<h2 id=arelu>A.ReLu</h2>
+<p><a href=https://atcoder.jp/contests/abc183/tasks/abc183_a>問題リンク</a></p>
+<p><code>cout &lt;&lt; max(0, x) &lt;&lt; endl;</code></p>
+<h2 id=bbilliards>B.Billiards</h2>
+<p><a href=https://atcoder.jp/contests/abc183/tasks/abc183_b>問題リンク</a></p>
+<p>いやむずすぎる　x座標について二分探索して入射角&lt;=反射角になる最も左の位置を見つけます<br>
+考察時間はBが一番長かったと思う</p>
+<h2 id=ctravel>C.Travel</h2>
+<p><a href=https://atcoder.jp/contests/abc183/tasks/abc183_c>問題リンク</a></p>
+<p>制約に答えが書いてあって、O(N!)が通る　訪問順全探索でOK<br>
+始点が1固定なの見落としててサンプル合わなかったのにびっくりした</p>
+<h2 id=dwater-heater>D.Water Heater</h2>
+<p><a href=https://atcoder.jp/contests/abc183/tasks/abc183_d>問題リンク</a></p>
+<p>どの時刻に対してもどれだけ湯量が必要かわかれば良い　区間可算ができればおわりです<br>
+今回は更新が無いのでimosでOK</p>
+<h2 id=equeen-on-grid>E.Queen on Grid</h2>
+<p><a href=https://atcoder.jp/contests/abc183/tasks/abc183_e>問題リンク</a></p>
+<p>5分くらい考えてわからなかったのでF行った　戻ってきたらすぐにわかりました<br>
+DPの遷移を考える -> 縦、横、斜めに対して壁に当たるまでの和が欲しい -> dp[i][j]を計算する時点でこれらの和は1つ手前まで求まっている</p>
+<p>縦横斜めの和を1で初期化しておくのを忘れてるのに気付かなくてデバッグで時間だいぶ食っちゃった</p>
+<h2 id=fconfluence>F.Confluence</h2>
+<p><a href=https://atcoder.jp/contests/abc183/tasks/abc183_f>問題リンク</a></p>
+<p>クエリ1を見て UnionFind ですねってなる<br>
+クエリ2を見てマージをうまくやりたいよねってなる<br>
+区間可算になる? -> 可算する値が一様だったり一次関数で表せたりする？<br>
+みたいにして自分の知識に対してアキネイターするとデータ構造をマージする一般的なテクが出て、解ける</p>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2020/11/21/arc108/ class=larrow>
+ARC108 感想
+</a>
+<a href=https://blog.toyama1710.net/posts/2020/10/27/test/ class=rarrow>
+Test
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>

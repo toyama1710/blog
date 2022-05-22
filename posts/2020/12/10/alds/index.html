@@ -1,0 +1,274 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>AOJ ALDS1 を Rust で全埋めしたので感想 | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="Aizu Online Judge の ALDS1 (アルゴリズムとデータ構造入門) を埋めた感想">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2020/12/10/alds/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2020/12/10/alds/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="AOJ ALDS1 を Rust で全埋めしたので感想">
+<meta property="og:description" content="Aizu Online Judge の ALDS1 (アルゴリズムとデータ構造入門) を埋めた感想">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/posts/2020/12/10/aoj.png">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css integrity=sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq crossorigin=anonymous>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js integrity=sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js integrity=sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI crossorigin=anonymous onload=renderMathInElement(document.body)></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}]})})</script>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>AOJ ALDS1 を Rust で全埋めしたので感想</h1>
+<p class=meta><time datetime=2020-12-10T19:50:56+09:00>December 10, 2020</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/%e7%ab%b6%e3%83%97%e3%83%ad/ class=categories_item>競プロ</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/%e7%ab%b6%e3%83%97%e3%83%ad/>競プロ</a></li>
+</ul>
+</div>
+</div>
+</header>
+<aside>
+<div class=toc>
+<details>
+<summary>Table of Contents</summary>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#はじめに>はじめに</a></li>
+<li><a href=#tle-に関して>TLE に関して</a></li>
+<li><a href=#章ごと所感>章ごと所感</a>
+<ul>
+<li><a href=#1-入門>1. 入門</a></li>
+<li><a href=#2-初等的ソート>2. 初等的ソート</a></li>
+<li><a href=#3-基本データ構造>3. 基本データ構造</a></li>
+<li><a href=#4-探索>4. 探索</a></li>
+<li><a href=#5-分割統治法>5. 分割統治法</a></li>
+<li><a href=#6-ソート>6. ソート</a></li>
+<li><a href=#7-木構造>7. 木構造</a></li>
+<li><a href=#8-二分探索木>8. 二分探索木</a></li>
+<li><a href=#9-ヒープ>9. ヒープ</a></li>
+<li><a href=#10-動的計画法>10. 動的計画法</a></li>
+<li><a href=#11-グラフ1>11. グラフ1</a></li>
+<li><a href=#12-グラフ2>12. グラフ2</a></li>
+<li><a href=#13-ヒューリスティック探索>13. ヒューリスティック探索</a></li>
+<li><a href=#14-文字列>14. 文字列</a></li>
+<li><a href=#15-貪欲アルゴリズム>15. 貪欲アルゴリズム</a></li>
+</ul>
+</li>
+<li><a href=#完走した感想>完走した感想</a></li>
+</ul>
+</nav>
+</details>
+</div>
+</aside><hr>
+<h2 id=はじめに>はじめに</h2>
+<p><img src=../aoj.png alt=ALDS1コンプリート記念スクショ></p>
+<p><a href=https://onlinejudge.u-aizu.ac.jp/courses/lesson/1/ALDS1/all>ALDS1</a> を埋めると大学のアルゴリズムとデータ構造の講義が出席免除になって試験だけで単位がもらえると聞いて埋めました。<br>
+本当は全 15 トピック中 13 までで良かったんですが勢い余って全部解いた<br>
+ちなみに Rust で解きました　イキリオタクなので</p>
+<p>Rust 特有の問題とか難しかった問題について簡単に発想/解説を書くつもりなので同級生たちの手助けになればいいな、と思います。</p>
+<h2 id=tle-に関して>TLE に関して</h2>
+<p>何人かに聞かれたので、書きます</p>
+<p>AOJ で C/C++ を使って実行時間制限 1 sec に間に合わせたい場合、ループ回数が大体 $10^8$ 回くらいになっていれば良いです。<br>
+$O(f(n))$ のようにして計算量を見積もると思いますが、問題の制約下での $f(n)$ の最大値を考えれば問題ありません。</p>
+<p>競プロerであるところの僕の肌感覚としては大体こんな感じ</p>
+<table>
+<thead>
+<tr>
+<th>計算回数</th>
+<th>お気持ち</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$10^7$</td>
+<td>十分間に合う</td>
+</tr>
+<tr>
+<td>$10^8$</td>
+<td>おそらく間に合う</td>
+</tr>
+<tr>
+<td>$10^9$</td>
+<td>十中八九無理 <br> 除算が絡んだら諦める　加算/乗算だけ、とかならワンチャン</td>
+</tr>
+</tbody>
+</table>
+<h2 id=章ごと所感>章ごと所感</h2>
+<h3 id=1-入門>1. 入門</h3>
+<p>C は計算量意識しないと TLE する</p>
+<p>C: 正整数 $N$ は $O(\sqrt N)$ で因数分解できます。</p>
+<p>$N$ の約数のペア( $a \times b = N$ である $a, b$) に着目したとき、 $a \le \sqrt N$ または $b \le \sqrt N$ が成り立ちます。<br>
+$a \times b = N$ のとき $a$ を増やせば $b$ が減ります。逆も同様。<br>
+ここで、 $a = b = \sqrt N$ を考えて $a, b$ をがちゃがちゃするとお気持ちがわかる。</p>
+<h3 id=2-初等的ソート>2. 初等的ソート</h3>
+<p>擬似コードに従ってコードを書けばおーけー</p>
+<p>D のパラメータを適当に決めて動きを見ると意外と面白い<br>
+手元で swap 回数を見たりするために適当な乱数データを用意しておくと良いと思う</p>
+<h3 id=3-基本データ構造>3. 基本データ構造</h3>
+<p>文句を言わずにコードを書きます</p>
+<p>List は先頭からポインタを辿って print する関数を作るとデバッグしやすいと思う</p>
+<p>D は括弧列を stack で管理しましょう、みたいな問題　けっこう面白かった</p>
+<h3 id=4-探索>4. 探索</h3>
+<p>A: 文句を言わずにコードを書きます<br>
+B: 探索区間を半開区間で扱うとバグらせにくいです。詳細は既存の解説記事に任せます <sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup><br>
+C: ハッシュテーブルを実装します　4進数として解釈して配列の添字として使うのが楽?</p>
+<p>D: ある程度競技ミングをやると見た瞬間「二分探索ですねえ！」ってなる問題<br>
+ある $P$ での最適解はトラックに貪欲に荷物を積んでいけば求まる<br>
+また $P$ が増えるほどにトラックの必要台数が減っていく(単調性がある) ので二分探索で条件に沿う $P$ を探せばよい</p>
+<h3 id=5-分割統治法>5. 分割統治法</h3>
+<p>A, B, C: 再帰関数を書くのに慣れるしかなくて、こればかりは書いて覚えるしかない</p>
+<p>Merge Sortの計算量解析、めっちゃ綺麗なので好き</p>
+<p>D: 競技ミングやってない人間に解ける問題に見えない<br>
+犯罪者なので定義通りに書いたあとセグメント木で高速化した　$O(N \log N)$</p>
+<h3 id=6-ソート>6. ソート</h3>
+<p>A, B, C: 問題文に擬似コードも載ってるし文句を言わずにコードを書きます</p>
+<p>Quick Sortの計算量について色々考えておくと後々二分探索木で伏線がつながってオタク・大盛り上がりするからオススメ</p>
+<p>D むっっっっっっっっっっずかしかった　ソート後に各 $w_i$ がどこに行って欲しいかでグラフを作る　必ず閉路ができるのでこの閉路ごとに解くことを考えると良い</p>
+<h3 id=7-木構造>7. 木構造</h3>
+<p>左子右兄弟表現とか使うメリットはあんまり無いと思う</p>
+<p>再帰は量書いて慣れるのが最良の練習方法だと思うので頑張りましょう</p>
+<p>D: 区間DPっぽくやる　中間順巡回で並んでいる頂点のうち、ある一つを根に持ち上げるとその左右に書かれている要素達がそのまま左部分木, 右部分木に対応するのがミソ<br>
+先行順巡回から木の元の根が分かるので、これを元に区間を分割して再帰的に解いていく<br>
+すごい面白い問題だった</p>
+<h3 id=8-二分探索木>8. 二分探索木</h3>
+<p>擬似コードついてるので文句を言わずにコードを書きます</p>
+<p>Rust で書くと親へのリンクを持ったときに循環参照が起きてメモリリークするので辛かった(ノード配列を持ってリンクを配列の添字として持つことで解決)</p>
+<p>問題文に書いてある擬似コードが Rust と相性悪くて苦戦した</p>
+<h3 id=9-ヒープ>9. ヒープ</h3>
+<p>A -> B -> C と上手く誘導に乗れるか勝負！みたいな章</p>
+<p>頂点への番号の振り方がよくわからなかったら自分で手を動かしてみると良いです</p>
+<p>デバッグはこんな感じで木を出力すると楽</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=kt>void</span> <span class=nf>print_tree</span><span class=p>(</span><span class=kt>int</span> <span class=n>root</span><span class=p>,</span> <span class=kt>int</span> <span class=n>depth</span><span class=p>)</span> <span class=p>{</span>
+    <span class=k>if</span> <span class=p>(</span><span class=n>root</span> <span class=o>&gt;=</span> <span class=n>n</span><span class=p>)</span> <span class=k>return</span><span class=p>;</span>
+
+    <span class=n>print_tree</span><span class=p>(</span><span class=n>root</span> <span class=o>*</span> <span class=mi>2</span> <span class=o>+</span> <span class=mi>1</span><span class=p>,</span> <span class=n>depth</span> <span class=o>+</span> <span class=mi>1</span><span class=p>);</span>
+
+    <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=n>depth</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=n>printf</span><span class=p>(</span><span class=s>&#34;        &#34;</span><span class=p>);</span>
+    <span class=n>printf</span><span class=p>(</span><span class=s>&#34;(%d, %d)</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>root</span><span class=p>,</span> <span class=n>A</span><span class=p>[</span><span class=n>root</span><span class=p>]);</span>
+    
+    <span class=n>print_tree</span><span class=p>(</span><span class=n>root</span> <span class=o>*</span> <span class=mi>2</span><span class=p>,</span> <span class=n>depth</span> <span class=o>+</span> <span class=mi>1</span><span class=p>);</span>
+<span class=p>}</span>
+</code></pre></div><p><code>print(1, 0)</code> みたいにして呼び出す　木を横向きにして辺を消した感じの表示になる</p>
+<p><a href=https://onlinejudge.u-aizu.ac.jp/courses/lesson/1/ALDS1/9/ALDS1_9_A>A問題</a> を例にすると</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell>$ ./a.out
+                <span class=o>(</span>7, 4<span class=o>)</span>
+        <span class=o>(</span>3, 5<span class=o>)</span>
+                <span class=o>(</span>6, 9<span class=o>)</span>
+<span class=o>(</span>1, 25<span class=o>)</span>
+                <span class=o>(</span>5, 8<span class=o>)</span>
+        <span class=o>(</span>2, 12<span class=o>)</span>
+                        <span class=o>(</span>9, 7<span class=o>)</span>
+                <span class=o>(</span>4, 6<span class=o>)</span>
+                        <span class=o>(</span>8, 3<span class=o>)</span>
+</code></pre></div><p>こんな感じの出力になる</p>
+<h3 id=10-動的計画法>10. 動的計画法</h3>
+<p>DP苦手なのでびっくりしたんだけど流石にこれくらいはね、できる</p>
+<p>A: 文句を言わずにコードを書きます<br>
+B: 授業でこれ扱うの！？って思ってびっくりした　区間DP <sup id=fnref:2><a href=#fn:2 class=footnote-ref role=doc-noteref>2</a></sup><br>
+C: Bより簡単だと思う<br>
+D: Bより簡単だと思う $O(N^3)$ の区間DP</p>
+<p>B:<br>
+$M_1 \times M_2 \times &mldr; \times M_n$ を計算するとき、最終的には $(M_1 \times M_2 \times &mldr; \times M_i) \times (M_{i + 1} \times M_{i + 2} \times &mldr; M_n)$ を計算するはず<br>
+ここで、左側と右側で独立にスカラ乗算の回数を最小化しようっていうのが基本方針\</p>
+<h3 id=11-グラフ1>11. グラフ1</h3>
+<p>再帰関数書けるかな？みたいな問題群</p>
+<p>Rust だとグラフを探索するのに結構冗長な書き方を強いられてちょっとモチベを下げた</p>
+<h3 id=12-グラフ2>12. グラフ2</h3>
+<p>11 までちゃんとやってたらすぐ解ける問題ばかりだと思う<br>
+やってなかったらさようなら&mldr;.</p>
+<p>Dijkstra法なんだけど DP の特殊形として見ると面白くない？ちなみに Rust は標準ライブラリのドキュメントにDijkstra法の実装が載ってる <sup id=fnref:3><a href=#fn:3 class=footnote-ref role=doc-noteref>3</a></sup>　草</p>
+<h3 id=13-ヒューリスティック探索>13. ヒューリスティック探索</h3>
+<p>実装が面倒なくらいで思考要素はそんなに無いと思う<br>
+文句を言わずにコードを書きます</p>
+<h3 id=14-文字列>14. 文字列</h3>
+<p>全体的に制約がきっっつい</p>
+<p>A: やります<br>
+B: Rolling Hash が楽だと思う<br>
+C: 2D Rolling Hash 以外思いつかない<br>
+D: 全文索引ですねぇ！！！！</p>
+<p>Dのメモリ制限がアホみたいにきつくてめちゃくちゃ時間かかった<br>
+SuffixTree で MLE 回避するために map を自作してる人まで居て面白かった</p>
+<p>あと B を演習室で解いてたんですが怪しい陽キャの方が「一年生のアルゴですか？僕教えますよ！」って言って $O(N^2)$ のパターンマッチングを教えてくれた　ありがとう</p>
+<h3 id=15-貪欲アルゴリズム>15. 貪欲アルゴリズム</h3>
+<p>A, B, D: やります<br>
+C: イベントソート</p>
+<h2 id=完走した感想>完走した感想</h2>
+<p>これはね、できる　なぜなら競技ミングをやってたからねって言ってたら9割5分終わってた<br>
+真面目に考えないと出来なかったのは 6D, 14D</p>
+<p>4Q は電磁気もあるし微積もあるしアルゴもあるし絶対どれかぶっちぎらないと死ぬと思っていたので切れて嬉しい</p>
+<section class=footnotes role=doc-endnotes>
+<hr>
+<ol>
+<li id=fn:1 role=doc-endnote>
+<p><a href=https://twitter.com/meguru_comp/status/697008509376835584>これ</a>と<a href=https://qiita.com/hamko/items/794a92c456164dcc04ad>これ</a>は一度読んでおくと良いと思う&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p>
+</li>
+<li id=fn:2 role=doc-endnote>
+<p>区間をより小さな区間に分割していくDP 小問題に分割して解くって意味ですごい基本的なDP<br>
+dp[i][j] = $[i, j)$ での解 みたいな風に持つのが一般的&#160;<a href=#fnref:2 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p>
+</li>
+<li id=fn:3 role=doc-endnote>
+<p><a href=https://doc.rust-lang.org/std/collections/binary_heap/>ここ</a>　標準ライブラリのサンプルコードが実用的すぎて好き&#160;<a href=#fnref:3 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2020/12/21/segtree/ class=larrow>
+セグメント木
+</a>
+<a href=https://blog.toyama1710.net/posts/2020/12/02/deployer/ class=rarrow>
+簡易Deployerを実装しました
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>

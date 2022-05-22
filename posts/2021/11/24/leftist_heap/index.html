@@ -1,0 +1,184 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>weight-biased leftist heap 書いた | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="meldable heapの一種であるところのleftist heap書いた　mergeがO(log N)でできる">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2021/11/24/leftist_heap/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2021/11/24/leftist_heap/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="weight-biased leftist heap 書いた">
+<meta property="og:description" content="meldable heapの一種であるところのleftist heap書いた　mergeがO(log N)でできる">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/img/default_thumbnail.png">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css integrity=sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq crossorigin=anonymous>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js integrity=sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js integrity=sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI crossorigin=anonymous onload=renderMathInElement(document.body)></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}]})})</script>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>weight-biased leftist heap 書いた</h1>
+<p class=meta><time datetime=2021-11-24T23:03:39+09:00>November 24, 2021</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/%e7%ab%b6%e3%83%97%e3%83%ad/ class=categories_item>競プロ</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/%e3%83%a9%e3%82%a4%e3%83%96%e3%83%a9%e3%83%aa/>ライブラリ</a></li><li class=tags_item><a href=https://blog.toyama1710.net/tags/%e3%83%92%e3%83%bc%e3%83%97/>ヒープ</a></li>
+</ul>
+</div>
+</div>
+</header>
+<aside>
+<div class=toc>
+<details>
+<summary>Table of Contents</summary>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#インタフェース>インタフェース</a>
+<ul>
+<li><a href=#template引数>template引数</a></li>
+<li><a href=#leftistheap-pusht-val>LeftistHeap &push(T val)</a></li>
+<li><a href=#leftistheap-merge_withleftistheap-h>LeftistHeap &merge_with(LeftistHeap &h)</a></li>
+<li><a href=#leftistheap-pop>LeftistHeap &pop()</a></li>
+<li><a href=#t-peek>T peek()</a></li>
+<li><a href=#int-size>int size()</a></li>
+<li><a href=#bool-empty>bool empty()</a></li>
+</ul>
+</li>
+<li><a href=#内部利用の関数と構造の解説>内部利用の関数と構造の解説</a>
+<ul>
+<li><a href=#構造>構造</a></li>
+<li><a href=#node-meldnode-h1-node-h2>Node *meld(Node *h1, Node *h2)</a></li>
+<li><a href=#計算量>計算量</a></li>
+<li><a href=#tips>tips</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+</details>
+</div>
+</aside><hr>
+<p><a href=https://toyama1710.github.io/cpp_library/heap/leftist_heap.hpp>LeftistHeap</a> のドキュメント</p>
+<p>最小ヒープになっていることと、C++のstd::priority_queueで言うところのtop()がpeek()になっている点に注意</p>
+<h2 id=インタフェース>インタフェース</h2>
+<h3 id=template引数>template引数</h3>
+<p>template引数Tは比較演算子&lt;を定義している必要がある</p>
+<h3 id=leftistheap-pusht-val>LeftistHeap &push(T val)</h3>
+<p>valをヒープに追加する $\Omicron (\log N)$</p>
+<h3 id=leftistheap-merge_withleftistheap-h>LeftistHeap &merge_with(LeftistHeap &h)</h3>
+<p>自身とhを融合する　このメソッドを呼び出した後hは空になる $\Omicron (\log N)$</p>
+<h3 id=leftistheap-pop>LeftistHeap &pop()</h3>
+<p>ヒープ中で最小の要素を削除する $\Omicron (\log N)$</p>
+<h3 id=t-peek>T peek()</h3>
+<p>ヒープ中で最小の要素を返す $\Theta (1)$</p>
+<h3 id=int-size>int size()</h3>
+<p>ヒープに格納されている要素の数を返す $\Theta (1)$</p>
+<h3 id=bool-empty>bool empty()</h3>
+<p>ヒープが空ならtrueを返しさもなくばfalseを返す $\Theta (1)$</p>
+<h2 id=内部利用の関数と構造の解説>内部利用の関数と構造の解説</h2>
+<h3 id=構造>構造</h3>
+<p>weight-biased leftist heapは次の条件を満たす二分木である</p>
+<ul>
+<li>どのノードも左部分木のサイズが右部分木のサイズ以上 (leftist property)</li>
+<li>どのノードも自身の持つ値は部分木の持つ値以下 (heapify)</li>
+</ul>
+<h3 id=node-meldnode-h1-node-h2>Node *meld(Node *h1, Node *h2)</h3>
+<p>h1とh2をマージした木の根を返す<br>
+以下の戦略で木をマージする　ただし、h1 &lt; h2であるとする</p>
+<p>h1が空であればh2を返す<br>
+そうでなくて、h2が空であればh1を返す<br>
+そうでなければ、h1.right = meld(h1.right, h2)として再帰的にマージ<br>
+leftist propertyが満たされなければh1の左右の子を入れ替える</p>
+<p>push,popはmeldを用いて次のように実装できる</p>
+<ul>
+<li>push: 単一ノードからなるヒープを作ってmeld</li>
+<li>pop: 根ノードを削除して左部分木と右部分木をmeld</li>
+</ul>
+<h3 id=計算量>計算量</h3>
+<p>meldは木を右へ降りていって空になったときに終了する<br>
+よって右スパイン<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup>の長さが$\Omicron(\log N)$であることを示せば良い</p>
+<p>leftist propertyより、右部分木のサイズは $\lfloor \frac{N-1}{2} \rfloor$ 以下である<br>
+そうでないとき、右部分木のサイズが左部分木のサイズより大きいことになるためlefitst propertyを満たさない<br>
+右へ降りていくとノード数が常に半分になっていくので、右スパインの長さは$\Omicron(\log N)$<br>
+$\log|x| + \log|y| \le 2 \times \log N$ よりmeld(x, y)の計算量のは $\Omicron(\log |x|) + \Omicron(\log |y|) = \Omicron(\log N)$</p>
+<h3 id=tips>tips</h3>
+<ul>
+<li>実は木の高さは $\Omicron(\log N)$ ではない
+<ul>
+<li>$1, 2, &mldr; ,N$ のようにデータを昇順に並べてpushしていくと木の高さが$\Theta(N)$ になる</li>
+</ul>
+</li>
+<li>ノードが親へのリンクを持たず、最悪計算量がいい感じなので何も考えずにpath-copyingで永続化できる
+<ul>
+<li><a href=https://toyama1710.github.io/cpp_library/heap/persistent_leftist_heap.hpp>実装例</a>と<a href=https://blog.toyama1710.net/posts/2021/11/24/persistent_leftist_heap/>ドキュメント</a></li>
+</ul>
+</li>
+</ul>
+<section class=footnotes role=doc-endnotes>
+<hr>
+<ol>
+<li id=fn:1 role=doc-endnote>
+<p>空ノードまでの最も右の経路&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2021/11/24/persistent_leftist_heap/ class=larrow>
+永続weight-biased lefitst heap書いた
+</a>
+<a href=https://blog.toyama1710.net/posts/2021/09/14/avl3/ class=rarrow>
+AVL木書いた3
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>
