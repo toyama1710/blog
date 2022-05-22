@@ -1,0 +1,7 @@
+{{ $src := .Get "file" }}
+{{ $lang := .Get "lang" }}
+{{ $s := readFile $src }}
+{{ $code := htmlUnescape $s }}
+<figure>
+{{ highlight $code $lang "linenos=table"}}
+</figure>

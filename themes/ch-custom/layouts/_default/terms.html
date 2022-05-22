@@ -1,0 +1,25 @@
+{{ define "main" }}
+
+<article>
+  {{- if .IsHome -}}
+  <header><h1 class="title">Posts</h1></header>
+  {{- else -}}
+  <header><h1 class="title">{{ .Title | default "Posts" }}</h1></header>
+  {{- end -}}
+
+  <ul class="term_list">
+    {{- $plural := .Data.Plural }}
+    {{- range $index, $term := .Data.Terms.Alphabetical }}
+    <li>
+      <div class="term_contenair">
+      <div class="term_name"><p>{{ .Page.Title }}</p></div>
+      <div class="term_posts"><p>{{ $term.Count }} posts</p></div>
+      <div class="term_link"><div class="more"><a href="{{ $.Site.LanguagePrefix }}/{{ $plural }}/{{ $term.Name | urlize }}/">VIEW POSTS</a></div>
+      </div>
+    </li>
+    {{- end }}
+  </ul>
+
+</article>
+
+{{ end }}

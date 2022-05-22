@@ -1,0 +1,22 @@
+{{ define "main" }}
+
+<article>
+
+  {{ with .Title }}
+  <header><h1 class="title">{{ . }}</h1></header>
+  {{ else }}
+  <header><h1 class="title">{{ .Site.Title }}</h1></header>
+  {{ end }}
+
+  <hr>
+  
+  {{ .Content }}
+
+  <hr>
+
+  <p><a href="javascript:void(history.back())" class="rarrow">back to the previous page</a></p>
+  <p><a href="/" class="rarrow">back to the top page</a></p>
+
+</article>
+
+{{ end }}

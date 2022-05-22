@@ -1,0 +1,27 @@
+{{ define "main" }}
+
+<article>
+
+{{- if .Site.IsServer -}}
+  <p><a href="/draft/" class="rarrow">draft article</a></p>
+{{- end -}}
+
+  {{ with .Title }}
+  <header><h1 class="title">{{ . }}</h1></header>
+  {{ else }}
+  <header><h1 class="title">{{ .Site.Title }}</h1></header>
+  {{ end }}
+
+  <hr>
+  
+  {{ .Content }}
+
+  <hr>
+  
+  <p><a href="/posts/" class="rarrow">VIEW POSTS</a></p>
+  <p><a href="/tags/" class="rarrow">VIEW TAGS</a></p>
+  <p><a href="/categories/" class="rarrow">VIEW CATEGORIES</a></p>
+
+</article>
+
+{{ end }}

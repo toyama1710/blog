@@ -1,0 +1,10 @@
+{{ if and (gt .WordCount 400) (.Params.toc) }}
+<aside>
+<div class="toc">
+<details>
+<summary>Table of Contents</summary>
+{{ .TableOfContents }}
+</details>
+</div>
+</aside>
+{{- end -}}

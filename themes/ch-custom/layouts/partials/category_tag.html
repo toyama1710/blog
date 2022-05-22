@@ -1,0 +1,24 @@
+{{ $baseURL := .Site.BaseURL }}
+<div class="categories meta">
+<p>categories:</p>
+{{ with .Params.categories }}
+    <ul class="categories_list">
+        {{ range . }} <li class="categories_item"><a href="{{ $baseURL }}categories/{{ lower . }}/" class="categories_item">{{ . }}</a></li>{{ end }}
+    </ul>
+{{ else }}
+    <ul class="categories_none_list"><li class="categories_none">None</li></ul>
+{{ end }}
+</div>
+
+<div class="tags meta">
+<p>tags:</p>
+{{ with .Params.tags }}
+    <ul class="tags_list">
+        {{ range . }}<li class="tags_item"><a href="{{ $baseURL }}tags/{{ lower . }}/">{{ . }}</a></li>{{ end }}
+    </ul>
+{{ else }}
+    <ul class="tags_none_list"><li class="tags_none">None</li></ul>
+{{ end }}
+</div>
+
+</div>

@@ -1,0 +1,35 @@
+{{ define "main" }}
+
+{{ partial "math.html" . }}
+
+<article>
+
+  <header><h1 class="title">{{ .Title }}</h1></header>
+
+{{- partial "paginate_nav.html" . -}}
+
+  <ul style="list-style-type: none;">
+
+{{- range (.Paginator 10).Pages -}}
+  <li class="page_list">
+  <div class="title"><a href="{{ .RelPermalink }}" class="list_title">{{ .Params.Title }}</a></div>
+  {{ if .Date }}<time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "January 02, 2006" }}</time>{{ end }}
+  {{ partial "category_tag.html" . }}
+  <p class="summary">
+  {{- with .Params.Description -}}
+    {{ . }}
+  {{- else -}}
+    {{ .Summary }}
+  {{- end -}}
+  </p>
+  <div class="more"><a href="{{ .RelPermalink }}">READ MORE</a></div>
+  </li>
+{{- end -}}
+
+  </ul>
+
+{{- partial "paginate_nav.html" . -}}
+
+</article>
+
+{{ end }}

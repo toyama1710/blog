@@ -1,0 +1,27 @@
+<nav class="pagination">
+  {{ if .Paginator.HasPrev }}
+  <p><a href="{{ .Paginator.Prev.URL }}" class="larrow">
+    NEW
+  </a></p>
+  {{ else }}
+  <p style="color: #8e8e91" class="larrow">
+    NEW
+  </p>
+  {{ end }}
+  
+  <p>
+  {{- .Paginator.PageNumber -}}
+  / 
+  {{- .Paginator.TotalPages -}}
+  </p>
+  
+  {{- if .Paginator.HasNext -}}
+  <p><a href="{{ .Paginator.Next.URL }}" class="rarrow">
+    OLD
+  </a></p>
+  {{- else -}}
+  <p style="color: #8e8e91" class="rarrow">
+    OLD
+  </p>
+  {{- end -}}
+</nav>
