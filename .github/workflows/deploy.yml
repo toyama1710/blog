@@ -1,4 +1,4 @@
-name: Build & Deploy
+name: Build and Deploy
 
 on:
   push:
@@ -17,7 +17,11 @@ jobs:
           hugo-version: '0.91.2'
 
       - name: Build
-        run: hugo --minify
+        run: |
+          hugo --minify
+          cp ./docs/403/index.html 403.html
+          cp ./docs/404/index.html 404.html
+          cp ./docs/500/index.html 500.html
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
