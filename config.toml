@@ -1,0 +1,25 @@
+baseURL = "https://blog.toyama1710.net/"
+title = "toyama1710 blog"
+theme = "ch-custom"
+paginate = 5
+publishDir = "docs"
+languageCode = "ja-jp"
+DefaultContentLanguage = "ja"
+enableInlineShortcodes = true
+pygmentsUseClasses = true
+hasCJKLanguage = true
+
+[Params]
+    description = "遠山のブログ"
+
+[taxonomies]
+    category = "categories"
+    tag = "tags"
+
+[markup.goldmark.renderer]
+    unsafe = true
+
+[markup.tableOfContents]
+    ordered = false
+    startlevel = 2
+    endlevel = 4
