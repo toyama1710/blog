@@ -18,7 +18,6 @@ layout: "index"
         - 青です
 - SNS
     - [Twitter](https://twitter.com/toyama_pts)
-        - 最近は鍵垢に引きこもって最悪発言をしています IDを推測してフォロリクを送ろう！
     - [Pixiv](https://www.pixiv.net/users/33235601)
 
 ## About this site
