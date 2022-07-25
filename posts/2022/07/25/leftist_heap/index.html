@@ -1,0 +1,251 @@
+<!doctype html><head>
+<html lang=ja-jp>
+<title>weight-biased Leftist Heap のC言語実装 | toyama1710 blog</title>
+<meta charset=utf-8>
+<meta name=generator content="Hugo 0.91.2">
+<meta name=description content="課外プロジェクト用資料">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=https://blog.toyama1710.net/css/syntax.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/index.css>
+<link rel=stylesheet href=https://blog.toyama1710.net/css/classes.css>
+<link rel=canonical href=https://blog.toyama1710.net/posts/2022/07/25/leftist_heap/>
+<link rel=alternate type=application/rss+xml href title="toyama1710 blog">
+<link rel=icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon type=image/png href=/img/site_icon.png>
+<link rel=apple-touch-icon-precomposed type=image/png href=/img/site_icon.png>
+<meta property="og:url" content="https://blog.toyama1710.net/posts/2022/07/25/leftist_heap/">
+<meta property="og:site_name" content="toyama1710 blog">
+<meta property="og:title" content="weight-biased Leftist Heap のC言語実装">
+<meta property="og:description" content="課外プロジェクト用資料">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://blog.toyama1710.net/img/default_thumbnail.png">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:site content="@toyama_pts">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T7034HPMW"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7T7034HPMW')</script>
+</head>
+<body>
+<header class=dark>
+<a href=https://blog.toyama1710.net/ class=head_title>toyama1710 blog</a>
+<a href=https://blog.toyama1710.net/posts/ class=head_posts>posts</a>
+<a href=https://blog.toyama1710.net/tags/ class=head_tags>tags</a>
+<a href=https://blog.toyama1710.net/categories/ class=head_categories>categories</a>
+</div>
+</header>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css integrity=sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq crossorigin=anonymous>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js integrity=sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js integrity=sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI crossorigin=anonymous onload=renderMathInElement(document.body)></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}]})})</script>
+<article>
+<header>
+<h1 style=margin-bottom:0 class=title>weight-biased Leftist Heap のC言語実装</h1>
+<p class=meta><time datetime=2022-07-25T23:09:27+09:00>July 25, 2022</time></p>
+<div class="categories meta">
+<p>categories:</p>
+<ul class=categories_list>
+<li class=categories_item><a href=https://blog.toyama1710.net/categories/others/ class=categories_item>others</a></li>
+</ul>
+</div>
+<div class="tags meta">
+<p>tags:</p>
+<ul class=tags_list>
+<li class=tags_item><a href=https://blog.toyama1710.net/tags/%e3%83%92%e3%83%bc%e3%83%97/>ヒープ</a></li>
+</ul>
+</div>
+</div>
+</header>
+<aside>
+<div class=toc>
+<details>
+<summary>Table of Contents</summary>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#コード>コード</a></li>
+</ul>
+<ul>
+<li><a href=#main関数内での木の扱い方>main関数内での木の扱い方</a></li>
+<li><a href=#swap-マクロ>swap マクロ</a></li>
+<li><a href=#size>size()</a></li>
+<li><a href=#single>single()</a></li>
+<li><a href=#mergenode-a-node-b>merge(Node *a, Node *b)</a></li>
+<li><a href=#insertnode-h-int-d>insert(Node *h, int d)</a></li>
+<li><a href=#deletemax>deleteMax()</a></li>
+</ul>
+</nav>
+</details>
+</div>
+</aside><hr>
+<p><a href=https://onlinejudge.u-aizu.ac.jp/problems/ALDS1_9_C>問題</a>と<a href=https://onlinejudge.u-aizu.ac.jp/status/users/ei1710/submissions/1/ALDS1_9_C/judge/6836873/C>提出</a></p>
+<h2 id=コード>コード</h2>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=cp>#include</span> <span class=cpf>&lt;stdio.h&gt;</span><span class=cp>
+</span><span class=cp>#include</span> <span class=cpf>&lt;stdlib.h&gt; // malloc(), free() の使用のために必要</span><span class=cp>
+</span><span class=cp>#include</span> <span class=cpf>&lt;string.h&gt; // strcmp() の使用のために必要</span><span class=cp>
+</span><span class=cp></span>
+<span class=cp>#define swap(Type, A, B) \
+</span><span class=cp>{                   \
+</span><span class=cp>    Type __tmp = A; \
+</span><span class=cp>    A = B;          \
+</span><span class=cp>    B = __tmp;      \
+</span><span class=cp>}                   \
+</span><span class=cp>
+</span><span class=cp></span><span class=k>typedef</span> <span class=k>struct</span> <span class=n>Node_</span> <span class=p>{</span>
+    <span class=kt>int</span> <span class=n>data</span><span class=p>;</span>
+    <span class=kt>int</span> <span class=n>size</span><span class=p>;</span>
+    <span class=k>struct</span> <span class=n>Node_</span> <span class=o>*</span><span class=n>lch</span><span class=p>,</span> <span class=o>*</span><span class=n>rch</span><span class=p>;</span> <span class=c1>// Cでは構造体タグ名の前にstructを付けないと型名として無効
+</span><span class=c1></span><span class=p>}</span> <span class=n>Node</span><span class=p>;</span>
+
+<span class=kt>int</span> <span class=nf>size</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=n>u</span><span class=p>);</span>
+<span class=n>Node</span> <span class=o>*</span><span class=nf>single</span><span class=p>(</span><span class=kt>int</span> <span class=n>d</span><span class=p>);</span>
+<span class=n>Node</span> <span class=o>*</span><span class=nf>merge</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=n>a</span><span class=p>,</span> <span class=n>Node</span> <span class=o>*</span><span class=n>b</span><span class=p>);</span>
+<span class=n>Node</span> <span class=o>*</span><span class=nf>insert</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=n>h</span><span class=p>,</span> <span class=kt>int</span> <span class=n>d</span><span class=p>);</span>
+<span class=n>Node</span> <span class=o>*</span><span class=nf>deleteMax</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=n>h</span><span class=p>);</span>
+<span class=kt>int</span> <span class=nf>findMax</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=n>h</span><span class=p>);</span>
+
+<span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+    <span class=n>Node</span> <span class=o>*</span><span class=n>root</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+    <span class=kt>char</span> <span class=n>s</span><span class=p>[</span><span class=mi>8</span><span class=p>];</span>
+
+    <span class=k>while</span> <span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+        <span class=n>scanf</span><span class=p>(</span><span class=s>&#34;%s&#34;</span><span class=p>,</span> <span class=n>s</span><span class=p>);</span>
+
+        <span class=k>if</span> <span class=p>(</span><span class=n>strcmp</span><span class=p>(</span><span class=n>s</span><span class=p>,</span> <span class=s>&#34;insert&#34;</span><span class=p>)</span> <span class=o>==</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+            <span class=kt>int</span> <span class=n>d</span><span class=p>;</span>
+            <span class=n>scanf</span><span class=p>(</span><span class=s>&#34;%d&#34;</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>d</span><span class=p>);</span>
+            <span class=n>root</span> <span class=o>=</span> <span class=n>insert</span><span class=p>(</span><span class=n>root</span><span class=p>,</span> <span class=n>d</span><span class=p>);</span>
+        <span class=p>}</span>
+        <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>strcmp</span><span class=p>(</span><span class=n>s</span><span class=p>,</span> <span class=s>&#34;extract&#34;</span><span class=p>)</span> <span class=o>==</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+            <span class=kt>int</span> <span class=n>x</span> <span class=o>=</span> <span class=n>findMax</span><span class=p>(</span><span class=n>root</span><span class=p>);</span>
+            <span class=n>root</span> <span class=o>=</span> <span class=n>deleteMax</span><span class=p>(</span><span class=n>root</span><span class=p>);</span>
+            <span class=n>printf</span><span class=p>(</span><span class=s>&#34;%d</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>x</span><span class=p>);</span>
+        <span class=p>}</span>
+        <span class=k>else</span> <span class=p>{</span> <span class=c1>// s == &#34;end&#34;
+</span><span class=c1></span>            <span class=k>break</span><span class=p>;</span>
+        <span class=p>}</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=kt>int</span> <span class=nf>size</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=n>u</span><span class=p>)</span> <span class=p>{</span>
+    <span class=k>if</span> <span class=p>(</span><span class=n>u</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span> <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+    <span class=k>else</span> <span class=k>return</span> <span class=n>u</span><span class=o>-&gt;</span><span class=n>size</span><span class=p>;</span>
+<span class=p>}</span>
+
+<span class=n>Node</span> <span class=o>*</span><span class=nf>single</span><span class=p>(</span><span class=kt>int</span> <span class=n>d</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>Node</span> <span class=o>*</span><span class=n>node</span> <span class=o>=</span> <span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=p>)</span><span class=n>malloc</span><span class=p>(</span><span class=k>sizeof</span><span class=p>(</span><span class=n>Node</span><span class=p>));</span>
+    <span class=n>node</span><span class=o>-&gt;</span><span class=n>data</span> <span class=o>=</span> <span class=n>d</span><span class=p>;</span>
+    <span class=n>node</span><span class=o>-&gt;</span><span class=n>size</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
+    <span class=n>node</span><span class=o>-&gt;</span><span class=n>lch</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+    <span class=n>node</span><span class=o>-&gt;</span><span class=n>rch</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+    <span class=k>return</span> <span class=n>node</span><span class=p>;</span>
+<span class=p>}</span>
+
+<span class=n>Node</span> <span class=o>*</span><span class=nf>merge</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=n>a</span><span class=p>,</span> <span class=n>Node</span> <span class=o>*</span><span class=n>b</span><span class=p>)</span> <span class=p>{</span>
+    <span class=k>if</span> <span class=p>(</span><span class=n>a</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span> <span class=k>return</span> <span class=n>b</span><span class=p>;</span>
+    <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>b</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span> <span class=k>return</span> <span class=n>a</span><span class=p>;</span>
+
+    <span class=k>if</span> <span class=p>(</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>data</span> <span class=o>&lt;</span> <span class=n>b</span><span class=o>-&gt;</span><span class=n>data</span><span class=p>)</span> <span class=n>swap</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=p>,</span> <span class=n>a</span><span class=p>,</span> <span class=n>b</span><span class=p>);</span>
+
+    <span class=n>a</span><span class=o>-&gt;</span><span class=n>rch</span> <span class=o>=</span> <span class=n>merge</span><span class=p>(</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>rch</span><span class=p>,</span> <span class=n>b</span><span class=p>);</span>
+    <span class=k>if</span> <span class=p>(</span><span class=n>size</span><span class=p>(</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>lch</span><span class=p>)</span> <span class=o>&lt;</span> <span class=n>size</span><span class=p>(</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>rch</span><span class=p>))</span> <span class=n>swap</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=p>,</span> <span class=n>a</span><span class=o>-&gt;</span><span class=n>lch</span><span class=p>,</span> <span class=n>a</span><span class=o>-&gt;</span><span class=n>rch</span><span class=p>);</span>
+    <span class=n>a</span><span class=o>-&gt;</span><span class=n>size</span> <span class=o>=</span> <span class=n>size</span><span class=p>(</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>lch</span><span class=p>)</span> <span class=o>+</span> <span class=n>size</span><span class=p>(</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>rch</span><span class=p>)</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>
+
+    <span class=k>return</span> <span class=n>a</span><span class=p>;</span>
+<span class=p>}</span>
+
+<span class=n>Node</span> <span class=o>*</span><span class=nf>insert</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=n>h</span><span class=p>,</span> <span class=kt>int</span> <span class=n>d</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>Node</span> <span class=o>*</span><span class=n>u</span> <span class=o>=</span> <span class=n>single</span><span class=p>(</span><span class=n>d</span><span class=p>);</span>
+    <span class=k>return</span> <span class=n>merge</span><span class=p>(</span><span class=n>h</span><span class=p>,</span> <span class=n>u</span><span class=p>);</span>
+<span class=p>}</span>
+
+<span class=n>Node</span> <span class=o>*</span><span class=nf>deleteMax</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=n>h</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>Node</span> <span class=o>*</span><span class=n>l</span> <span class=o>=</span> <span class=n>h</span><span class=o>-&gt;</span><span class=n>lch</span><span class=p>;</span>
+    <span class=n>Node</span> <span class=o>*</span><span class=n>r</span> <span class=o>=</span> <span class=n>h</span><span class=o>-&gt;</span><span class=n>rch</span><span class=p>;</span>
+    <span class=n>free</span><span class=p>(</span><span class=n>h</span><span class=p>);</span>
+    <span class=k>return</span> <span class=n>merge</span><span class=p>(</span><span class=n>l</span><span class=p>,</span> <span class=n>r</span><span class=p>);</span>
+<span class=p>}</span>
+
+<span class=kt>int</span> <span class=nf>findMax</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=n>h</span><span class=p>)</span> <span class=p>{</span>
+    <span class=k>return</span> <span class=n>h</span><span class=o>-&gt;</span><span class=n>data</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><h1 id=実装の解説>実装の解説</h1>
+<p><a href=https://blog.toyama1710.net/posts/2021/11/24/leftist_heap/#%E6%A7%8B%E9%80%A0>データ構造の解説</a></p>
+<h2 id=main関数内での木の扱い方>main関数内での木の扱い方</h2>
+<p>根へのポインタで木を管理する<br>
+木へ何らかの操作を加えるたびに適宜更新する<br>
+例えば、<code>deleteMax(root)</code> を呼び出した後、戻り値で <code>root</code> を更新している</p>
+<h2 id=swap-マクロ>swap マクロ</h2>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=cp>#define swap(Type, A, B) \
+</span><span class=cp>{                   \
+</span><span class=cp>    Type __tmp = A; \
+</span><span class=cp>    A = B;          \
+</span><span class=cp>    B = __tmp;      \
+</span><span class=cp>}                   \
+</span></code></pre></div><p><code>swap(型名, 変数1, 変数2)</code> の形で使用する<br>
+<code>swap(int, a, b)</code> のように書くと、以下のように展開される</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=p>{</span>
+    <span class=kt>int</span> <span class=n>__tmp</span> <span class=o>=</span> <span class=n>a</span><span class=p>;</span>
+    <span class=n>a</span> <span class=o>=</span> <span class=n>b</span><span class=p>;</span>
+    <span class=n>b</span> <span class=o>=</span> <span class=n>__tmp</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=size>size()</h2>
+<p>ノードへのポインタを受け取り、これを根とする部分木のサイズ(=ノード数)を返す<br>
+ヌルポインタが渡されたときは 0 を返す<br>
+メンバ変数 size にアクセスする際にいちいちヌルチェックを挟むのが面倒なので関数に切り出した</p>
+<h2 id=single>single()</h2>
+<p>ノード1つだけからなる木を作り、根へのポインタを返す\</p>
+<h2 id=mergenode-a-node-b>merge(Node *a, Node *b)</h2>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=k>if</span> <span class=p>(</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>data</span> <span class=o>&lt;</span> <span class=n>b</span><span class=o>-&gt;</span><span class=n>data</span><span class=p>)</span> <span class=n>swap</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=p>,</span> <span class=n>a</span><span class=p>,</span> <span class=n>b</span><span class=p>);</span>
+</code></pre></div><p>と書いてこれ以降は a->data $\ge$ b->data が常に成り立つようにしている<br>
+b->data > a->data の場合を考慮しなくてよいので実装が簡潔になる</p>
+<h2 id=insertnode-h-int-d>insert(Node *h, int d)</h2>
+<p>h を根とする木にデータ d を追加する関数<br>
+ノード1つだけの木を作ったあと merge() を呼び出せばよい</p>
+<h2 id=deletemax>deleteMax()</h2>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=n>Node</span> <span class=o>*</span><span class=nf>deleteMax</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=n>h</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>Node</span> <span class=o>*</span><span class=n>l</span> <span class=o>=</span> <span class=n>h</span><span class=o>-&gt;</span><span class=n>lch</span><span class=p>;</span>
+    <span class=n>Node</span> <span class=o>*</span><span class=n>r</span> <span class=o>=</span> <span class=n>h</span><span class=o>-&gt;</span><span class=n>rch</span><span class=p>;</span>
+    <span class=n>free</span><span class=p>(</span><span class=n>h</span><span class=p>);</span>
+    <span class=k>return</span> <span class=n>merge</span><span class=p>(</span><span class=n>l</span><span class=p>,</span> <span class=n>r</span><span class=p>);</span>
+<span class=p>}</span>
+</code></pre></div><p>h を根とする木から最大値を取り除いた木の根を返す<br>
+ヒープでは根が最大値を持っている<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup>ので根を除いた木を作りたい<br>
+これは根の左右の子をmerge()で1つにまとめてしまえば良い</p>
+<p><code>free(h)</code> した後はhが指すメモリ領域へのアクセスが許されないので <code>h->lch</code> や <code>h-rch</code> にアクセスできないことに注意</p>
+<section class=footnotes role=doc-endnotes>
+<hr>
+<ol>
+<li id=fn:1 role=doc-endnote>
+<p>ヒープ条件(heapify)の不等号を逆にして最小値を持つように定義する場合もある&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+<hr>
+<nav class=prev_next>
+<a href=https://blog.toyama1710.net/posts/2021/12/09/bit_op/ class=rarrow>
+bit演算シリーズ
+</a>
+</nav>
+</nav>
+</article>
+<footer>
+<ul>
+<li><address><a href=https://github.com/toyama1710/ target=_blank rel="noopener noreferrer">github</a></address></li>
+<li><address><a href=https://twitter.com/toyama_pts/ target=_blank rel="noopener noreferrer">twitter</a></address></li>
+</ul>
+<ul>
+<li>
+<p>Built with <a href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a>
+using <a href=https://themes.gohugo.io/contrast-hugo/ target=_blank rel="noopener noreferrer">contrast-hugo</a> theme.</p>
+</li>
+</ul>
+<ul>
+<li><p>This site use Google Analytics.</p></li>
+<li><p><a href=/privacy/>Privacy Policy</a></p></li>
+</ul>
+<ul>
+<li>
+<p>&copy; 2020 toyama1710</p>
+</li>
+</ul>
+</footar>
+</body>
+</html>
