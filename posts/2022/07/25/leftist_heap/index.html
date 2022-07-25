@@ -191,7 +191,7 @@
 ヌルポインタが渡されたときは 0 を返す<br>
 メンバ変数 size にアクセスする際にいちいちヌルチェックを挟むのが面倒なので関数に切り出した</p>
 <h2 id=single>single()</h2>
-<p>ノード1つだけからなる木を作り、根へのポインタを返す\</p>
+<p>ノード1つだけからなる木を作り、根へのポインタを返す</p>
 <h2 id=mergenode-a-node-b>merge(Node *a, Node *b)</h2>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=k>if</span> <span class=p>(</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>data</span> <span class=o>&lt;</span> <span class=n>b</span><span class=o>-&gt;</span><span class=n>data</span><span class=p>)</span> <span class=n>swap</span><span class=p>(</span><span class=n>Node</span> <span class=o>*</span><span class=p>,</span> <span class=n>a</span><span class=p>,</span> <span class=n>b</span><span class=p>);</span>
 </code></pre></div><p>と書いてこれ以降は a->data $\ge$ b->data が常に成り立つようにしている<br>
