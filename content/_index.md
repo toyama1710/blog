@@ -17,7 +17,7 @@ layout: "index"
     - [AtCoder](https://atcoder.jp/users/toyama)
         - 青です
 - SNS
-    - [Twitter](https://twitter.com/toyama_pts)
+    - [Twitter(現X)](https://twitter.com/toyama_tty)
     - [Pixiv](https://www.pixiv.net/users/33235601)
 
 ## About this site
